@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
+import unics.Enum.AbilityType;
 import unics.Enum.CardType;
 import unics.Enum.Faction;
 import unics.Enum.Keyword;
@@ -81,17 +82,18 @@ public abstract class CardGenerator {
 
         // 2️⃣ Effets
         List<CardEffect> effects = new ArrayList<>();
-
+        Set<AbilityType> usedAbilities = new HashSet<>();
         switch (type) {
 
             case ACTION -> {
                 // Toute la valeur passe dans les effets
                 while (remainingBudget > SEUIL_BUDGET_RESTANT && effects.size() < NB_MAX_EFFECT_ACTION) {
-                    CardEffect e = CardEffect.generateRandomEffect(type, energyCost, random,profile);
+                    CardEffect e = CardEffect.generateRandomEffect(type, energyCost, random,profile,usedAbilities);
                     //double power = Math.abs(e.computeRelativePower(energyCost));
                     double power = Math.abs(e.computeRawPower());
                     if (power <= remainingBudget) {
                         effects.add(e);
+                        usedAbilities.add(e.getAbility());
                         remainingBudget -= power;
                     } else {
                         break;
@@ -108,11 +110,12 @@ public abstract class CardGenerator {
             			roll_effect < (PCT_0_EFFECT+PCT_1_EFFECT) ? 1 : 2;
             			
                 for (int i=0;i<effecCount;i++) {
-                    CardEffect e = CardEffect.generateRandomEffect(type, energyCost, random,profile);
+                    CardEffect e = CardEffect.generateRandomEffect(type, energyCost, random,profile,usedAbilities);
                     //double power = Math.abs(e.computeRelativePower(energyCost));
                     double power = Math.abs(e.computeRawPower());
                     if (power <= remainingBudget) {
                         effects.add(e);
+                        usedAbilities.add(e.getAbility());
                         remainingBudget -= power;
                     }
                 }

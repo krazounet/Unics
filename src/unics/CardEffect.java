@@ -77,7 +77,8 @@ public class CardEffect {
             CardType cardType,
             int energyCost,
             ThreadLocalRandom random,
-            FactionProfile profile
+            FactionProfile profile,
+            Set<AbilityType> excludedAbilities
     ) {
     	
     	
@@ -104,6 +105,7 @@ public class CardEffect {
                 .filter(a -> isAbilityAllowedForCardType(a, cardType))//filtre les abilitype en fonction du type
                 .filter(a -> !(cardType == CardType.STRUCTURE && a.isNegativeForOwner()))//les structures ont que des effets positifs
                 .filter(a -> !profile.getForbiddenAbilities().contains(a))
+                .filter(a -> !excludedAbilities.contains(a))
                 .toList();
 
         List<AbilityType> weighted_abilities = new ArrayList<>();
