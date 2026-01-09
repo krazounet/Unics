@@ -131,7 +131,7 @@ public enum TriggerType {
     ),
 
     PC_DAMAGED(
-        "Quand les PC changent",
+        "Quand vos PC changent",
         "La capacité se déclenche lorsque les points de commandement changent",
         15,
         EnumSet.of(CardType.UNIT, CardType.STRUCTURE)

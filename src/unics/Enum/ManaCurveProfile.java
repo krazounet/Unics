@@ -4,11 +4,11 @@ import java.util.Random;
 
 public enum ManaCurveProfile {
 
-    AGGRO(25),
-    MIDRANGE(30),
-    BALANCED(25),
-    CONTROL(15),
-    HEAVY(5);
+    AGGRO(20),
+    MIDRANGE(20),
+    BALANCED(20),
+    CONTROL(20),
+    HEAVY(20);
 
     private final int weight;
     private static final Random RNG = new Random();

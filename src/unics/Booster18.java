@@ -1,9 +1,11 @@
 package unics;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import unics.Enum.CardType;
+import unics.Enum.Faction;
 
 public class Booster18 extends Booster {
 
@@ -13,19 +15,33 @@ public class Booster18 extends Booster {
 	
 	public Booster18(ThreadLocalRandom random) {
 		super(random);
-		manacurve = new BoosterManaCurve(18).getCurve();
+		manacurve = new BoosterManaCurve(18,manaCurveProfile).getCurve();
+		int index_booster=0;
+		List<Faction> factions =
+		        FactionDistribution.generate(List.of(12, 6));
 		cards= new ArrayList<>();
-		cards.addAll(generateCards(CardType.UNIT, NB_UNIT_MIN));
-		cards.addAll(generateCards(CardType.STRUCTURE, NB_STRUCTURE_MIN));
-		cards.addAll(generateCards(CardType.ACTION, NB_ACTION_MIN));
+		for (int i=0; i<NB_UNIT_MIN;i++) {
+			cards.add(generateValidatedCard(CardType.UNIT,manacurve.get(index_booster),factions.get(index_booster)));
+			index_booster++;
+		}
+		for (int i=0; i<NB_STRUCTURE_MIN;i++) {
+			cards.add(generateValidatedCard(CardType.STRUCTURE,manacurve.get(index_booster),factions.get(index_booster)));
+			index_booster++;
+		}
+		for (int i=0; i<NB_ACTION_MIN;i++) {
+			cards.add(generateValidatedCard(CardType.ACTION,manacurve.get(index_booster),factions.get(index_booster)));
+			index_booster++;
+		}
+
     	for (int i = 0; i < 3; i++) {
     	    CardType type = random.nextInt(100) < 33 ? CardType.UNIT
     	                    : random.nextInt(100) < 66 ? CardType.ACTION
     	                    : CardType.STRUCTURE;
+    	    cards.add(generateValidatedCard(type,manacurve.get(index_booster),factions.get(index_booster)));
+    	    index_booster++;
 
-    	    cards.addAll(generateCards(type,1));
 		
-	}
+    	}
 	}
 
 }

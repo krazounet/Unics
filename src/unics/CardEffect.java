@@ -162,6 +162,13 @@ public class CardEffect {
         }
         int value = random.nextInt(1, maxValue + 1);
 
+        /**
+         * Value doit etre abaissée dans certains cas : 
+         * - il ne sert a rien de buter 5 ennemy unit
+         * - il ne sert a rien de buter 3 structures
+         * - il ne sert a rien de faire 17 mouvements
+         */
+        value = Math.min(value, ability.maxValue());
         // 6️⃣ Contraintes
      // Contraintes obligatoires (ex : UNIT / STRUCTURE)
         Set<TargetConstraint> constraints = new HashSet<>();
@@ -244,7 +251,7 @@ public class CardEffect {
     
     public String toDisplayString() {
         StringBuilder sb = new StringBuilder();
-
+        sb.append("("+this.computeRawPower()+")");
         // Trigger
         
         
@@ -309,6 +316,7 @@ public class CardEffect {
      * @param energyCost
      * @return
      */
+    @Deprecated
     public double computeRelativePower(int energyCost) {
         double raw =
                 trigger.getWeight()
@@ -329,8 +337,10 @@ public class CardEffect {
      * @return
      */
     public double computeRawPower() {
+    	int trigger_weight = trigger.getWeight();
+    	if (ability.isNegativeForOwner()) trigger_weight =-trigger_weight;
         double raw =
-                trigger.getWeight()
+        		trigger_weight
               + (ability.getWeight()
               * (value != null ? value : 1));
 

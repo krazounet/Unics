@@ -40,7 +40,7 @@ public class BalancedBoosterGenerator {
     	else 				lp=getDefaultListPath();
     	
         // Export PDF
-        BoosterPdfExporterStyled.exportBoosterToPdf(booster, pdfFileName+booster.getPublicId()+".pdf",lp);
+        BoosterPdfExporterStyled.exportBoosterToPdf(booster, pdfFileName+booster.getPublicId()+"-"+booster.cards.size()+"-"+booster.getManaCurveProfile()+".pdf",lp);
     }
 
     public static List<Path> getDefaultListPath(){

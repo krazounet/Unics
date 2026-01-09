@@ -12,7 +12,7 @@ public class Booster9 extends Booster {
 	    
 	public Booster9(ThreadLocalRandom random) {
 		super(random);
-		//new BoosterManaCurve12();
+		
 		manacurve = new BoosterManaCurve(9).getCurve();
 		
 		cards= new ArrayList<>();

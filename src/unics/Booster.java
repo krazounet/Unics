@@ -6,6 +6,8 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 import unics.Enum.CardType;
+import unics.Enum.Faction;
+import unics.Enum.ManaCurveProfile;
 
 public abstract class Booster {
 
@@ -18,14 +20,19 @@ public abstract class Booster {
     ThreadLocalRandom random;
     
     static int NB_ESSAI_CARTE=50;
-   
+    protected ManaCurveProfile manaCurveProfile;
+    protected List<Integer> manaCurve;
+
+	public ManaCurveProfile getManaCurveProfile() {
+		return manaCurveProfile;
+	}
 
 	public Booster(ThreadLocalRandom random) {
 		super();
 		this.id = UUID.randomUUID();
 		publicId = PublicIdGenerator.fromUuid(id);
 		this.random=random;
-		
+		this.manaCurveProfile = ManaCurveProfile.random();
 		cards= new ArrayList<>();
 		
 	
@@ -50,12 +57,21 @@ public abstract class Booster {
             if (CardGenerator.isValid(candidate)) {
                 return candidate;
             }
-            
         }
         throw new IllegalStateException("Impossible de générer une carte valide "+type+ "/"+cost);
-
     }
-
+    protected Card generateValidatedCard(CardType type, int cost,Faction faction) {
+        //Card bestCard = null;
+        for (int i = 0; i < NB_ESSAI_CARTE; i++) {
+            Card candidate = CardGenerator.generateCard(type,cost,random,faction);//ici agir sur le cout
+            if (CardGenerator.isValid(candidate)) {
+                return candidate;
+            }
+        }
+        throw new IllegalStateException("Impossible de générer une carte valide "+type+ "/"+cost);
+    }
+    
+    
 	public List<Card> getCards() {
 		return cards;
 	}

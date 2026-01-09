@@ -114,7 +114,7 @@ public enum AbilityType {
     DESTROY_UNIT_ENEMY(
         "Destruction Structure",
         "Détruit une unité",
-        35,
+        40,
         true,
         EnumSet.of(TargetConstraint.UNIT ),
         EnumSet.of(TargetConstraint.STRUCTURE)
@@ -163,7 +163,7 @@ public enum AbilityType {
     ENERGY_GAIN_ENEMY(
         "Gain énergie (ennemi)",
         "L’adversaire gagne X énergie",
-        15,
+        -15,
         false,
         EnumSet.noneOf(TargetConstraint.class),
         EnumSet.noneOf(TargetConstraint.class)
@@ -312,18 +312,18 @@ public enum AbilityType {
                     "Piochez " + x + "carte" + (value > 1 ? "s" : "");
 
             case DESTROY_UNIT_ENEMY ->
-                    "Détruit une unité ennemie";
+                    "Détruit "+x+" unité"+ (value > 1 ? "s" : "")+ " ennemie";
 
             case DESTROY_STRUCTURE_ENEMY ->
-                    "Détruit une structure ennemie";
+                    "Détruit "+x+" structure"+(value > 1 ? "s" : "")+ " ennemie";
 
             // ──────────────── Mouvement ────────────────
 
             case MOVE_ALLY ->
-                    "Déplace une unité alliée";
+                    "Déplace une unité alliée "+x+" fois";
 
             case MOVE_ENEMY ->
-                    "Déplace une unité ennemie";
+                    "Déplace une unité ennemie "+x+" fois";
 
             // ──────────────── Énergie ────────────────
 
@@ -344,5 +344,18 @@ public enum AbilityType {
     @Override
     public String toString() {
         return displayName + " (" + name() + ", poids=" + weight + ")";
+    }
+    
+    public int maxValue() {
+    	switch(this){
+    	case DESTROY_UNIT_ENEMY : 		return 3;
+    	case DESTROY_STRUCTURE_ENEMY : 	return 2;
+    	case MOVE_ALLY :				return 2;
+    	case MOVE_ENEMY : 				return 2;
+    	
+		default:return 100;
+			
+    	
+    	}
     }
 }

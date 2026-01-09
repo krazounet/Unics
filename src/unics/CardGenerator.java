@@ -43,17 +43,18 @@ public abstract class CardGenerator {
     }
 
     
-
-    
     public static Card generateCard(CardType type, int energyCost, ThreadLocalRandom random) {
+    	Faction faction = randomFaction();
+    	return generateCard(type,energyCost,random,faction);
+    }
+    
+    public static Card generateCard(CardType type, int energyCost, ThreadLocalRandom random, Faction faction) {
 
         int initialBudget = BUDGET_BASE + BUDGET_PER_ENERGY * energyCost;
         int remainingBudget = initialBudget;
         //int depense=0;
 
-        // 0️⃣ Faction aléatoire
-        Faction faction = randomFaction();
-        //factionRegistry = new FactionProfileRegistry();
+
         FactionProfile profile = FactionProfileRegistry.get(faction);
         
         // 1️⃣ Keywords
@@ -69,10 +70,12 @@ public abstract class CardGenerator {
 
             for (int i = 0; i < keywordCount; i++) {
                 Keyword kw = Keyword.randomPlayable(random, type,profile);
-                /*if (keywords.add(kw)) {
-                    remainingBudget -= kw.getWeight();
-                }*/
+
                 keywords.add(kw);//ajout du keyword sans toucher au budget
+            }
+            
+            if((type == CardType.STRUCTURE)&&(!keywords.contains(Keyword.DEFENSIF))){
+            	 keywords.add(Keyword.DEFENSIF);
             }
         }
 
@@ -85,8 +88,8 @@ public abstract class CardGenerator {
                 // Toute la valeur passe dans les effets
                 while (remainingBudget > SEUIL_BUDGET_RESTANT && effects.size() < NB_MAX_EFFECT_ACTION) {
                     CardEffect e = CardEffect.generateRandomEffect(type, energyCost, random,profile);
-                    double power = Math.abs(e.computeRelativePower(energyCost));
-
+                    //double power = Math.abs(e.computeRelativePower(energyCost));
+                    double power = Math.abs(e.computeRawPower());
                     if (power <= remainingBudget) {
                         effects.add(e);
                         remainingBudget -= power;
@@ -106,8 +109,8 @@ public abstract class CardGenerator {
             			
                 for (int i=0;i<effecCount;i++) {
                     CardEffect e = CardEffect.generateRandomEffect(type, energyCost, random,profile);
-                    double power = Math.abs(e.computeRelativePower(energyCost));
-
+                    //double power = Math.abs(e.computeRelativePower(energyCost));
+                    double power = Math.abs(e.computeRawPower());
                     if (power <= remainingBudget) {
                         effects.add(e);
                         remainingBudget -= power;
@@ -127,7 +130,7 @@ public abstract class CardGenerator {
             // Défense minimale vitale
             
             //remainingBudget -= COUT_DEF*defense;
-            //depense=calculBudgetSpent(attack,defense,keywords,effects,energyCost);
+            
             remainingBudget=initialBudget-calculBudgetSpent(attack,defense,keywords,effects,energyCost);
             if (type == CardType.STRUCTURE) {
                 // 🧱 STRUCTURE → DEF uniquement
@@ -175,7 +178,8 @@ public abstract class CardGenerator {
 			depense +=k.computeWeight(attack,defense,energyCost);
 		}
 		for(CardEffect e : effects) {
-			depense +=e.computeRelativePower(energyCost);
+			//depense +=e.computeRelativePower(energyCost);
+			depense +=e.computeRawPower();
 		}
 		return depense;
 	}

@@ -12,7 +12,6 @@ public class Booster12 extends Booster {
 	    
 	public Booster12(ThreadLocalRandom random) {
 		super(random);
-		// TODO Auto-generated constructor stub
 		
 		manacurve = new BoosterManaCurve(12).getCurve();
 		
