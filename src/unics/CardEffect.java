@@ -32,6 +32,8 @@ public class CardEffect {
     
     private final Set<TargetConstraint> constraints;
     
+    private static int MODIFIER_CONTRAINTE_NEGATIVE = -40; //exprimé en %, arbitraire pour le moment
+    
     public Set<TargetConstraint> getConstraints() {
 		return constraints;
 	}
@@ -67,9 +69,13 @@ public class CardEffect {
     public TargetType getTargetType() {
         return targetType;
     }
-
     
-    /**
+    
+    public Keyword getConditionKeyword() {
+		return conditionKeyword;
+	}
+
+	/**
      * Génère un effet aléatoire pour une carte donnée,
      * proportionné au coût et type de carte.
      */
@@ -257,18 +263,34 @@ public class CardEffect {
         // Trigger
         
         
-        if (trigger != null) {
-        	
-        	if (trigger == TriggerType.KEYWORD_PRESENT) {
-        	    sb.append("Si le mot-clé ")
-        	      .append(conditionKeyword.name())
-        	      .append(" est présent : ");
-        	}
-        	else
-            sb.append(trigger.getShortDisplay()).append(" : ");
-            
-            
+        
+        sb.append(trigger.getShortDisplay(conditionKeyword)).append(" : ");
+        // Texte principal
+        String text = ability.buildText(value);
+
+        boolean targetsCard =
+                ability.requiresTarget()
+                && (targetType == TargetType.ALLY || targetType == TargetType.ENEMY);
+
+        if (constraints != null && !constraints.isEmpty()) {
+            if (targetsCard) {
+                text = applyTargetConstraints(text, constraints);
+            } else {
+                text += " si " + buildPossessionCondition(constraints);
+            }
         }
+
+        sb.append(text);
+        return sb.toString().trim();
+    }
+    /*
+     * L'effet sans le trigger
+     */
+    public String getEffectText() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(": ("+(int)Math.round(this.computeRawPower())+") ");
+        
+        //int i= (int)Math.round(this.computeRawPower());
 
         // Texte principal
         String text = ability.buildText(value);
@@ -288,7 +310,6 @@ public class CardEffect {
         sb.append(text);
         return sb.toString().trim();
     }
-
     private String applyTargetConstraints(String base, Set<TargetConstraint> constraints) {
 
         StringBuilder sb = new StringBuilder(base);
@@ -349,10 +370,34 @@ public class CardEffect {
         double modifier = 100;//pour 100%
         for (TargetConstraint c : constraints) {
             modifier += c.getPowerModifier(); // ex: -15
+            if (ability.isNegativeForOwner()) modifier+=MODIFIER_CONTRAINTE_NEGATIVE;//valeur arbitraire temporaire
         }
         modifier =modifier/100;
         
 
         return (raw * modifier);
     }
+    /**
+     * sert à l'unicité des effects et pour le hash
+     * @return
+     */
+    public String toIdentityString() {
+
+        String constraintsPart = constraints == null
+            ? ""
+            : constraints.stream() 
+                .map(Enum::name)
+                .sorted()
+                .collect(java.util.stream.Collectors.joining(","));
+
+        return String.join(":",
+            trigger.name(),
+            conditionKeyword != null ? conditionKeyword.name() : "NONE",
+            ability.name(),
+            value != null ? value.toString() : "0",
+            targetType.name(),
+            constraintsPart
+        );
+    }
+
 }

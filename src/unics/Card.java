@@ -11,8 +11,10 @@ import unics.Enum.Keyword;
 public final class Card {
 
     // Identité
-    private final UUID id;
-    private final String publicId;
+    private final UUID id; 			//identifiant technique
+    private final String publicId;	//identifiant exposé
+    private CardIdentity identity;	//unicité métier (éviter les doublons)
+    
     private final String name;
 
     // Classification
@@ -37,6 +39,8 @@ public final class Card {
 
     public Card(
             UUID id,
+            String pubid,
+            CardIdentity identity,
             String name,
             CardType cardType,
             Faction faction,
@@ -48,7 +52,8 @@ public final class Card {
             int powerScore
     ) {
         this.id = id;
-        this.publicId = PublicIdGenerator.fromUuid(id);
+        this.publicId = pubid;
+        this.identity = identity;
         this.name = name;
         this.cardType = cardType;
         this.faction = faction;
@@ -63,6 +68,7 @@ public final class Card {
     // Getters uniquement (immutabilité)
     public UUID getId() { return id; }
     public String getPublicId() {return publicId;}
+    public CardIdentity getIdentity() {return identity;}
     public String getName() { return name; }
     public CardType getCardType() { return cardType; }
     public Faction getFaction() { return faction; }

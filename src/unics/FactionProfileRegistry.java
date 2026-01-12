@@ -1,6 +1,8 @@
 package unics;
 
 import unics.Enum.*;
+
+import java.awt.RenderingHints.Key;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
@@ -111,12 +113,16 @@ public final class FactionProfileRegistry {
                 +20,
                 Set.of(
                     Keyword.MOBILE,
-                    Keyword.FURTIF
+                    Keyword.FURTIF,
+                    Keyword.INSAISISSABLE
                 ),
                 Set.of(
                     Keyword.BOUCLIER
                 ),
-                Set.of(),
+                Set.of(	TriggerType.ON_MOVE,
+                		TriggerType.POSITION_BACK,
+                		TriggerType.POSITION_FRONT,
+                		TriggerType.POSITION_MIDDLE),
                 Set.of(),
                 Set.of(
                     AbilityType.MOVE_ALLY,
@@ -147,10 +153,11 @@ public final class FactionProfileRegistry {
                 Set.of(
                     AbilityType.DEBUFF_ENEMY,
                     AbilityType.DRAW,
-                    AbilityType.DAMAGE_PC_ENEMY
+                    AbilityType.DAMAGE_PC_ENEMY,
+                    AbilityType.BUFF
                 ),
                 Set.of(
-                    AbilityType.BUFF
+                    AbilityType.MOVE_ALLY
                 )
             )
         );

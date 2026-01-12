@@ -5,6 +5,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -39,9 +40,13 @@ import com.itextpdf.layout.properties.Property;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
+import com.itextpdf.layout.element.Text;
+
 
 import unics.Enum.CardType;
 import unics.Enum.Faction;
+import unics.Enum.Keyword;
+import unics.Enum.TriggerType;
 
 public class BoosterPdfExporterStyled {
 
@@ -65,7 +70,11 @@ public class BoosterPdfExporterStyled {
     //private static final float BG_OPACITY = 0.06f;
     private static final float STATS_HEIGHT = 26f;
     
-     
+ // Compensation mécanique imprimante (verso uniquement)
+    private static final float BACK_OFFSET_X = -8.5f; // -3 mm
+    private static final float BACK_OFFSET_Y =  -2.8f; // +1 mm
+
+    
     public static void exportBoosterToPdf(Booster cards, String outputPath,List<Path> imagePaths) {
 
         try {
@@ -212,7 +221,7 @@ public class BoosterPdfExporterStyled {
                  image.setProperty(Property.OBJECT_FIT, ObjectFit.COVER);
 
                  // 👉 pas de marges implicites
-                 //image.setMargin(0);
+
                  image.setPadding(0);
                  image.setBorder(Border.NO_BORDER);
 
@@ -225,20 +234,18 @@ public class BoosterPdfExporterStyled {
 
                 contentLayer.add(illustrationBox);
                 /* ───── Texte (zone FIXE + police adaptative) ───── */
-                /*Div textBox = new Div()
-                        .setHeight(70) // 🔒 FIXE
-                        .setMarginBottom(4);*/
+               
                 Div textBox = new Div()
-                	    .setMaxHeight(72)   // 🔒 LIMITE, pas obligation
-                	    .setMarginBottom(6)
-                	    //.setBackgroundColor(colorForFaction(card.getFaction()))
-                        ;
+                	    //.setMaxHeight(72)   // 🔒 LIMITE, pas obligation
+                		.setHeight(90)
+                		.setBackgroundColor(backgroundColorForFaction(card.getFaction()))
+                	    .setMarginBottom(6);
 
                 int totalTextLength = 0;
 
                 if (!card.getKeywords().isEmpty()) {
                     String kw = card.getKeywords().stream()
-                            .map(Enum::name)
+                            .map(Keyword::getDisplayName)
                             .reduce((a, b) -> a + " · " + b)
                             .orElse("");
 
@@ -257,9 +264,40 @@ public class BoosterPdfExporterStyled {
                 float effectFontSize = adaptiveFontSize(totalTextLength);
 
                 for (CardEffect effect : card.getEffects()) {
-                	textBox.add(new Paragraph(effect.toDisplayString())
-                            .setFontSize(effectFontSize)
-                            .setMarginBottom(2));
+
+                	Paragraph p = new Paragraph()
+                	        .setFontSize(effectFontSize)
+                	        .setMarginBottom(2);
+                	Text txt_trigger = new Text(effect.getTrigger().getShortDisplay(effect.getConditionKeyword())).setUnderline();
+                	p.add(txt_trigger);
+                	String txt_effect=effect.getEffectText();
+                	for (String mot : txt_effect.split(" ")) {
+                	    switch (mot) {
+                	        case "énergie":
+                	            p.add(createIcon("resources/images/icons/energy.png"));
+                	            break;
+                	        case "dégâts":
+                	            p.add(createIcon("resources/images/icons/hit.png"));
+                	            break;
+                	        case "PC":
+                	            p.add(createIcon("resources/images/icons/PC.png"));
+                	            break;    
+                	       /*
+                	        case "Piochez":
+                	            p.add(createIcon("resources/images/icons/pioche.png"));
+                	            break;    
+                	        case "Défaussez":
+                	            p.add(createIcon("resources/images/icons/defausse.png"));
+                	            break;
+                	           */    
+                	        default:
+                	            p.add(new Text(mot));
+                	    }
+                	    p.add(" "); // espace entre mots
+                	}
+                	//p.add(effect.getEffectText());
+                	textBox.add(p);
+
                 }
 
                 
@@ -289,8 +327,9 @@ public class BoosterPdfExporterStyled {
                 	            .setMargin(0)
                 	            .setFont(bold)
                 	            .setFontSize(6);
-                	    
-                	    p.add(""+card.getFaction()+"\n UNIT");
+                	   
+                	    p.add(new Text(card.getFaction()+"\n UNIT"));
+                	   // p.add(createIcon("resources/images/icons/faction/ORGANIC.png"));
                 	    Cell c =new Cell()
                         	    .setBorder(new SolidBorder(0.5f))
                         	    .setBackgroundColor(new DeviceRgb(245, 245, 245))
@@ -415,6 +454,11 @@ public class BoosterPdfExporterStyled {
     private static void addBackPage(Document document) throws IOException {
 
         Table backTable = new Table(UnitValue.createPercentArray(3))
+        		
+        		// 🎯 DÉCALAGE GLOBAL DU VERSO
+                .setMarginLeft(BACK_OFFSET_X)
+                .setMarginTop(BACK_OFFSET_Y)
+                
                 .setWidth(UnitValue.createPercentValue(100));
 
         ImageData backData = loadCardBackImageData();
@@ -431,6 +475,11 @@ public class BoosterPdfExporterStyled {
 
                 Div cardDiv = new Div()
                         .setHeight(CARD_HEIGHT)
+                        /*
+                        // 🎯 compensation imprimante
+                        .setMarginLeft(BACK_OFFSET_X)
+                        .setMarginTop(BACK_OFFSET_Y)
+                        */
                         .setBorder(new SolidBorder(1));
 
                 // ✔ Nouvelle instance Image (obligatoire en iText)
@@ -459,12 +508,17 @@ public class BoosterPdfExporterStyled {
     }
     private static Image createCardBack(ImageData data) {
         Image img = new Image(data);
-        img.setWidth(CARD_WIDTH);
-        img.setHeight(CARD_HEIGHT);
+
+        // ⚠️ NE PAS fixer de taille absolue
+        img.setWidth(UnitValue.createPercentValue(100));
+        img.setHeight(UnitValue.createPercentValue(100));
+
         img.setProperty(Property.OBJECT_FIT, ObjectFit.COVER);
         img.setBorder(Border.NO_BORDER);
+
         return img;
     }
+
 
     private static Image icon(String path, float size) throws IOException {
         ImageData data = ImageDataFactory.create(path);
@@ -502,6 +556,15 @@ public class BoosterPdfExporterStyled {
             case MECHANICAL -> new DeviceRgb(120, 120, 120);
             case OCCULT -> new DeviceRgb(120, 90, 150);
             case NOMAD -> new DeviceRgb(160, 140, 100);
+        };
+    }
+    private static Color backgroundColorForFaction(Faction faction) {
+        return switch (faction) {
+            case ASTRAL -> new DeviceRgb(225, 230, 245);
+            case ORGANIC -> new DeviceRgb(225, 240, 230);
+            case MECHANICAL -> new DeviceRgb(235, 235, 235);
+            case OCCULT -> new DeviceRgb(235, 225, 245);
+            case NOMAD -> new DeviceRgb(245, 240, 225);
         };
     }
 
@@ -548,7 +611,86 @@ public class BoosterPdfExporterStyled {
         return ImageDataFactory.create(baos.toByteArray());
     }
 
+    private static Image triggerIconOrNull(TriggerType trigger, float size) {
+        String resourcePath = "/images/icons/trigger/" + trigger.name() + ".png";
 
+        try {
+            var stream = BoosterPdfExporterStyled.class.getResourceAsStream(resourcePath);
+            if (stream == null) {
+            	System.out.println(resourcePath);
+                return null; // icône absente → fallback texte
+            }
+
+            ImageData data = ImageDataFactory.create(stream.readAllBytes());
+            Image img = new Image(data);
+            img.setWidth(size);
+            img.setHeight(size);
+            img.setAutoScale(false);
+            img.setBorder(Border.NO_BORDER);
+            img.setMarginRight(4);
+
+            return img;
+
+        } catch (IOException e) {
+            return null; // sécurité absolue
+        }
+    }
+
+    private static Table triggerIconChipOrNull(
+            TriggerType trigger,
+            float fontSize,
+            Color backgroundColor
+    ) {
+        String resourcePath = "/images/icons/trigger/" + trigger.name() + ".png";
+
+        try (var stream = BoosterPdfExporterStyled.class.getResourceAsStream(resourcePath)) {
+
+            if (stream == null) {
+                return null;
+            }
+
+            float iconSize = fontSize + 1;
+
+            ImageData data = ImageDataFactory.create(stream.readAllBytes());
+            Image icon = new Image(data)
+                    .setWidth(iconSize)
+                    .setHeight(iconSize)
+                    .setBorder(Border.NO_BORDER);
+
+            Cell cell = new Cell()
+                    .setBorder(Border.NO_BORDER)
+                    .setBackgroundColor(backgroundColor)
+                    .setPaddingLeft(1.5f)
+                    .setPaddingRight(1.5f)
+                    .setPaddingTop(0.8f)
+                    .setPaddingBottom(1.2f)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
+                    .add(icon);
+
+            Table chip = new Table(1)
+                    .setWidth(iconSize + 3)
+                    .setBorder(Border.NO_BORDER)
+                    .setMarginRight(4);
+
+            chip.addCell(cell);
+
+            return chip;
+
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+
+    private static Image createIcon(String path) throws MalformedURLException {
+        Image img = new Image(ImageDataFactory.create(path));
+        img.setWidth(10);
+        img.setHeight(10);
+        img.setMarginRight(2);
+        img.setRelativePosition(0, -2f, 0, 0);//décalage en bas de l'image
+        return img;
+    }
 
 
 

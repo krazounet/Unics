@@ -1,5 +1,8 @@
 package unics.Enum;
-
+/**
+ * contrainte a la réalisation d'un effet
+ * le powermodifer est en %
+ */
 public enum TargetConstraint {
 
     // ───────── Type de carte ─────────
@@ -7,16 +10,16 @@ public enum TargetConstraint {
     STRUCTURE("structure", 0),
 
     // ───────── Faction ─────────
-    FACTION_ASTRAL("astrale", -5),
-    FACTION_ORGANIC("organique", -5),
-    FACTION_NOMAD("nomade", -5),
-    FACTION_MECHANICAL("mécanique", -5),
-    FACTION_OCCULT("occulte", -5),
+    FACTION_ASTRAL("astrale", -30),
+    FACTION_ORGANIC("organique", -30),
+    FACTION_NOMAD("nomade", -30),
+    FACTION_MECHANICAL("mécanique", -30),
+    FACTION_OCCULT("occulte", -30),
 
     // ───────── Coût ─────────
     COST_3_OR_LESS("de coût 3 ou moins", -5),
     COST_2_OR_LESS("de coût 2 ou moins", -10),
-    COST_1_OR_LESS("de coût 1 ou moins", -15);
+    COST_1_OR_LESS("de coût 1", -15);//a revoir si des cartes coute 0
 
     private final String displayName;
     private final int powerModifier; // ⚠️ négatif
@@ -71,36 +74,36 @@ public enum TargetConstraint {
 
             // Factions
             case FACTION_ASTRAL ->
-                    "une carte astrale en jeu";
+                    "une autre carte astrale en jeu";
 
             case FACTION_ORGANIC ->
-                    "une carte organique en jeu";
+                    "une autre carte organique en jeu";
 
             case FACTION_NOMAD ->
-                    "une carte nomade en jeu";
+                    "une autre carte nomade en jeu";
 
             case FACTION_MECHANICAL ->
-                    "une carte mécanique en jeu";
+                    "une autre carte mécanique en jeu";
 
             case FACTION_OCCULT ->
-                    "une carte occulte en jeu";
+                    "une autre carte occulte en jeu";
 
             // Coûts
             case COST_1_OR_LESS ->
-                    "une carte de coût 1 ou moins";
+                    "une autre carte de coût 1 ou moins";
 
             case COST_2_OR_LESS ->
-                    "une carte de coût 2 ou moins";
+                    "une autre carte de coût 2 ou moins";
 
             case COST_3_OR_LESS ->
-                    "une carte de coût 3 ou moins";
+                    "une autre carte de coût 3 ou moins";
 
             // Types
             case UNIT ->
-                    "une unité en jeu";
+                    "une autre unité en jeu";
 
             case STRUCTURE ->
-                    "une structure en jeu";
+                    "une autre structure en jeu";
         };
     }
     

@@ -131,7 +131,7 @@ public enum TriggerType {
     ),
 
     PC_DAMAGED(
-        "Quand vos PC changent",
+        "Quand vous perdez des PC ",
         "La capacité se déclenche lorsque les points de commandement changent",
         15,
         EnumSet.of(CardType.UNIT, CardType.STRUCTURE)
@@ -165,7 +165,7 @@ public enum TriggerType {
     public boolean isAllowedFor(CardType sourceType) {
         return allowedSourceTypes.contains(sourceType);
     }
-    public String getShortDisplay() {
+    public String getShortDisplay(Keyword kw) {
         return switch (this) {
             case ON_PLAY -> "Quand cette carte est jouée";
             case ON_ENTER -> "Quand cette carte arrive en jeu";
@@ -175,6 +175,7 @@ public enum TriggerType {
             case ON_TURN_START -> "Au début de votre tour";
             case ON_TURN_END -> "À la fin de votre tour";
             case ON_MOVE -> "Quand cette carte change de position";
+            case KEYWORD_PRESENT -> "Si une de vos carte a "+kw.name();
             default -> getDisplayName();
         };
     }

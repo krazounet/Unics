@@ -81,11 +81,24 @@ public final class CardBuilder {
         String publicId = PublicIdGenerator.fromUuid(id);
         String name = CardNameGenerator.generateName(faction, type, publicId, keywords);
 
-     
+     // 1️⃣ Construire l'identité gameplay
+        CardIdentity identity = new CardIdentity(
+            type,
+            faction,
+            energyCost,
+            attack != null ? attack : 0,
+            defense != null ? defense : 0,
+            keywords != null
+                ? keywords.stream().map(Enum::name).toList()
+                : List.of(),
+            effects != null ? effects : List.of()
+        );
 
         // Construire la carte finale
         return new Card(
                 id,
+                publicId,
+                identity,
                 name,
                 type,
                 faction,

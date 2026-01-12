@@ -114,7 +114,7 @@ public enum AbilityType {
     DESTROY_UNIT_ENEMY(
         "Destruction Structure",
         "Détruit une unité",
-        40,
+        50,
         true,
         EnumSet.of(TargetConstraint.UNIT ),
         EnumSet.of(TargetConstraint.STRUCTURE)
@@ -122,7 +122,7 @@ public enum AbilityType {
     DESTROY_STRUCTURE_ENEMY(
             "Destruction",
             "Détruit une unité",
-            25,
+            30,
             true,
             EnumSet.of( TargetConstraint.STRUCTURE),
             EnumSet.of(TargetConstraint.UNIT)
@@ -185,10 +185,41 @@ public enum AbilityType {
         false,
         EnumSet.noneOf(TargetConstraint.class),
         EnumSet.noneOf(TargetConstraint.class)
-    );
-
-    // ─────────────────────────────────────────────
-
+    ),
+	//
+    // ────────────────TAP_UNTAP─────────────────────
+	TAP_ENEMY(
+	        "Incline un ennemi",
+	        "Incline un ennemi",
+	        25,
+	        false,
+	        EnumSet.noneOf(TargetConstraint.class),
+	        EnumSet.noneOf(TargetConstraint.class)
+	    ),
+	TAP_ALLY(
+	        "Incline un allié",
+	        "Incline un allié",
+	        -25,
+	        false,
+	        EnumSet.noneOf(TargetConstraint.class),
+	        EnumSet.noneOf(TargetConstraint.class)
+	    ),
+	UNTAP_ENEMY(
+	        "Redresse un ennemi",
+	        "Redresse un ennemi",
+	        25,
+	        false,
+	        EnumSet.noneOf(TargetConstraint.class),
+	        EnumSet.noneOf(TargetConstraint.class)
+	    ),
+	UNTAP_ALLY(
+	        "Redresse un allié",
+	        "Redresse un allié",
+	        -25,
+	        false,
+	        EnumSet.noneOf(TargetConstraint.class),
+	        EnumSet.noneOf(TargetConstraint.class)
+	    );
     private final String displayName;
     private final String description;
     private final int weight;
@@ -259,6 +290,8 @@ public enum AbilityType {
                  ENERGY_LOSS_SELF,
                  DISCARD_SELF,
                  DAMAGE_UNIT_ALLY,
+                 TAP_ALLY,
+                 UNTAP_ENEMY,
                  DAMAGE_PC_SELF -> true;
 
             default -> false;
@@ -287,24 +320,24 @@ public enum AbilityType {
                     "Inflige " + x + "dégâts à une unité alliée";
 
             case DAMAGE_PC_SELF ->
-                    "Vous subissez " + x + "dégâts";
+                    "Vous subissez " + x + "PC";
 
             case DAMAGE_PC_ENEMY ->
-                    "Inflige " + x + "dégâts aux points de commandement ennemis";
+                    "Inflige " + x + "PC à l'ennemi";
 
             case HEAL_PC ->
-                    "Restaure " + x + "points de commandement";
+                    "Restaure " + x + "PC";
 
             // ──────────────── Stats ────────────────
 
             case BUFF ->
-                    "Augmente les statistiques d’une unité alliée de " + value;
+                    "+"+value+"/+"+value+" à une unité alliée";
 
             case DEBUFF_ENEMY ->
-                    "Réduit les statistiques d’une unité ennemie de " + value;
+                    "-"+value+"/-"+value+" à une unité ennemie";
 
             case DEBUFF_ALLY ->
-                    "Réduit les statistiques d’une unité alliée de " + value;
+            		"-"+value+"/-"+value+" à une unité alliée";
 
             // ──────────────── Cartes ────────────────
 
@@ -328,16 +361,25 @@ public enum AbilityType {
             // ──────────────── Énergie ────────────────
 
             case ENERGY_GAIN_SELF ->
-                    "Gagnez " + x + "énergie";
+                    "+" + x + "énergie";
 
             case ENERGY_GAIN_ENEMY ->
-                    "L’adversaire gagne " + x + "énergie";
+                    "L’adversaire gagne " + x + "énergie"+(value > 1 ? "s" : "");
 
             case ENERGY_LOSS_SELF ->
-                    "Vous perdez " + x + "énergie";
+                    "-" + x + "énergie";
 
             case ENERGY_LOSS_ENEMY ->
-                    "L’adversaire perd " + x + "énergie";
+                    "L’adversaire perd " + x + "énergie"+(value > 1 ? "s" : "");
+                    
+            case TAP_ALLY ->
+            	"Incline " + x + "unité"+(value > 1 ? "s" : "")+" alliée"+(value > 1 ? "s" : "");        
+            case UNTAP_ALLY ->
+            "Redresse " + x + "unité"+(value > 1 ? "s" : "")+" alliée"+(value > 1 ? "s" : "");  
+            case TAP_ENEMY ->
+           	"Incline " + x + "unité"+(value > 1 ? "s" : "")+" ennemie"+(value > 1 ? "s" : ""); 
+            case UNTAP_ENEMY ->
+            "Redresse " + x + "unité"+(value > 1 ? "s" : "")+" ennemie"+(value > 1 ? "s" : "");  
         };
     }
 

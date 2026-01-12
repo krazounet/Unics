@@ -36,6 +36,7 @@ public enum Keyword {
     private final String description;
     private final int generatorWeight;
 
+        
     // Constructeur
     Keyword(String description, int generatorWeight) {
         this.description = description;
@@ -146,5 +147,15 @@ public enum Keyword {
                 return this.generatorWeight;
         }
     }
-    
+    public String getDisplayName() {
+    	switch (this) {
+        case IMMUNITE_CONTRE_ASTRAL: return "IMMUNITE CONTRE ASTRAL";
+        case IMMUNITE_CONTRE_ORGANIC: return "IMMUNITE CONTRE ORGANIC";
+        case IMMUNITE_CONTRE_MECHANICAL: return "IMMUNITE CONTRE MECHANICAL";
+        case IMMUNITE_CONTRE_NOMAD: return "IMMUNITE CONTRE NOMAD";
+        case IMMUNITE_CONTRE_OCCULT: return "IMMUNITE CONTRE OCCUL";
+        
+        default: return name();
+    	}
+    }
 }
