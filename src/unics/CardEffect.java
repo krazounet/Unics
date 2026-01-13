@@ -132,6 +132,7 @@ public class CardEffect {
         List<TriggerType> triggers = Arrays.stream(TriggerType.values())
         	    .filter(t -> t.isAllowedFor(cardType))
         	    .filter(t -> ability.getAllowedTriggers(cardType).contains(t))
+        	    .filter(t -> !ability.getForbiddenTriggers(cardType).contains(t))
         	    .filter(t -> !profile.getForbiddenTrigger().contains(t))
         	    .toList();
         if (triggers.isEmpty()) {
@@ -290,9 +291,7 @@ public class CardEffect {
         StringBuilder sb = new StringBuilder();
         sb.append(": ("+(int)Math.round(this.computeRawPower())+") ");
         
-        //int i= (int)Math.round(this.computeRawPower());
 
-        // Texte principal
         String text = ability.buildText(value);
 
         boolean targetsCard =

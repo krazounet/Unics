@@ -100,6 +100,7 @@ public enum Keyword {
             	if (this == FRAPPE_IMMEDIATE) return false;
             	if (this == TRAMPLE) return false;
             	if (this == FIRST_STRIKE) return false;
+            	if (this == INSAISISSABLE) return false;
             	
             	return true;
             case ACTION : return false;
@@ -153,7 +154,7 @@ public enum Keyword {
         case IMMUNITE_CONTRE_ORGANIC: return "IMMUNITE CONTRE ORGANIC";
         case IMMUNITE_CONTRE_MECHANICAL: return "IMMUNITE CONTRE MECHANICAL";
         case IMMUNITE_CONTRE_NOMAD: return "IMMUNITE CONTRE NOMAD";
-        case IMMUNITE_CONTRE_OCCULT: return "IMMUNITE CONTRE OCCUL";
+        case IMMUNITE_CONTRE_OCCULT: return "IMMUNITE CONTRE OCCULT";
         
         default: return name();
     	}

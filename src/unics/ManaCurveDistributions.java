@@ -8,18 +8,18 @@ public class ManaCurveDistributions {
 
     public static final Map<ManaCurveProfile, Map<Integer, Integer>> WEIGHTS = Map.of(
         ManaCurveProfile.AGGRO, Map.of(
-            1, 30,
+            1, 20,
             2, 35,
             3, 20,
             4, 10,
-            5, 5,
-            6, 0
+            5, 10,
+            6, 5
         ),
         ManaCurveProfile.MIDRANGE, Map.of(
             1, 10,
             2, 25,
-            3, 30,
-            4, 20,
+            3, 25,
+            4, 25,
             5, 10,
             6, 5
         ),
@@ -42,9 +42,9 @@ public class ManaCurveDistributions {
         ManaCurveProfile.BALANCED, Map.of(
             1, 15,
             2, 20,
-            3, 25,
+            3, 20,
             4, 20,
-            5, 10,
+            5, 15,
             6, 10
         )
     );

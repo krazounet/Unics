@@ -215,7 +215,7 @@ public enum AbilityType {
 	UNTAP_ALLY(
 	        "Redresse un allié",
 	        "Redresse un allié",
-	        -25,
+	        25,
 	        false,
 	        EnumSet.noneOf(TargetConstraint.class),
 	        EnumSet.noneOf(TargetConstraint.class)
@@ -280,10 +280,21 @@ public enum AbilityType {
                 TriggerType.ON_TURN_START,
                 TriggerType.ON_PLAY
             );
-
+            
             default -> EnumSet.allOf(TriggerType.class);
         };
     }
+    
+    public EnumSet<TriggerType> getForbiddenTriggers(CardType cardType) {
+    	return switch (this) {
+    	case TAP_ENEMY,UNTAP_ENEMY -> EnumSet.of(
+    			TriggerType.NO_ENEMY_UNITS
+    			);
+    	default -> EnumSet.noneOf(TriggerType.class);
+    	};
+    }
+    
+    
     public boolean isNegativeForOwner() {
         return switch (this) {
             case DEBUFF_ALLY,
@@ -292,7 +303,9 @@ public enum AbilityType {
                  DAMAGE_UNIT_ALLY,
                  TAP_ALLY,
                  UNTAP_ENEMY,
-                 DAMAGE_PC_SELF -> true;
+                 DAMAGE_PC_SELF,
+                 ENERGY_GAIN_ENEMY
+                 -> true;
 
             default -> false;
         };

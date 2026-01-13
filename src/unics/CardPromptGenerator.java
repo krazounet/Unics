@@ -269,6 +269,8 @@ public class CardPromptGenerator {
                 "";
             case DISCARD_ENEMY ->
             "";
+            case TAP_ALLY,UNTAP_ALLY,TAP_ENEMY,UNTAP_ENEMY -> "";
+            
 		default -> throw new IllegalArgumentException("Unexpected value: " + ability);
         };
     }

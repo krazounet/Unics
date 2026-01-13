@@ -14,9 +14,9 @@ public class BalancedBoosterGenerator {
 	
 	//private static List<Integer> manaCurve;
 
-	static boolean MAKE_IA_IMAGE=false;
+	static boolean MAKE_IA_IMAGE=true;
 			
-	static int nb_booster=1;
+	static int nb_booster=15;
 	// Exemple main pour test
     public static void main(String[] args) throws Exception {
     	
