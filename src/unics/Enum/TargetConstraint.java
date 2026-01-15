@@ -4,11 +4,11 @@ package unics.Enum;
  * le powermodifer est en %
  */
 public enum TargetConstraint {
-
+	/*
     // ───────── Type de carte ─────────
     UNIT("unité", 0),
     STRUCTURE("structure", 0),
-
+	*/
     // ───────── Faction ─────────
     FACTION_ASTRAL("astrale", -30),
     FACTION_ORGANIC("organique", -30),
@@ -17,9 +17,9 @@ public enum TargetConstraint {
     FACTION_OCCULT("occulte", -30),
 
     // ───────── Coût ─────────
-    COST_3_OR_LESS("de coût 3 ou moins", -5),
-    COST_2_OR_LESS("de coût 2 ou moins", -10),
-    COST_1_OR_LESS("de coût 1", -15);//a revoir si des cartes coute 0
+    COST_3_OR_LESS("de coût 3 ou moins", -20),
+    COST_2_OR_LESS("de coût 2 ou moins", -25),
+    COST_1_OR_LESS("de coût 1", -30);//a revoir si des cartes coute 0
 
     private final String displayName;
     private final int powerModifier; // ⚠️ négatif
@@ -60,11 +60,12 @@ public enum TargetConstraint {
                  COST_2_OR_LESS,
                  COST_3_OR_LESS
                     -> getDisplayName();
-
+                    /*
             // Type → rarement affiché (souvent déjà implicite)
             case UNIT,
                  STRUCTURE
-                    -> ""; // volontairement vide
+                    -> "*"; // volontairement vide
+              		*/
         };
     }
     
@@ -97,13 +98,14 @@ public enum TargetConstraint {
 
             case COST_3_OR_LESS ->
                     "une autre carte de coût 3 ou moins";
-
+                    /*
             // Types
             case UNIT ->
                     "une autre unité en jeu";
 
             case STRUCTURE ->
                     "une autre structure en jeu";
+                    */
         };
     }
     

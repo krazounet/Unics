@@ -54,7 +54,7 @@ public enum TriggerType {
     ),
 
     AFTER_RECEIVE_DAMAGE(
-        "Après avoir subi des dégâts",
+        "Après que cette carte ait subi des dégâts",
         "La capacité se déclenche après que cette carte a subi des dégâts",
         15,
         EnumSet.of(CardType.UNIT, CardType.STRUCTURE)
@@ -134,7 +134,7 @@ public enum TriggerType {
         "Quand vous perdez des PC ",
         "La capacité se déclenche lorsque les points de commandement changent",
         15,
-        EnumSet.of(CardType.UNIT, CardType.STRUCTURE)
+        EnumSet.of(CardType.UNIT)// Structure retirée, car le calcul de la puissance n'avait aucun sens.
     );
 
     // ──────────────────────────────
