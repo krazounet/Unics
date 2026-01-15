@@ -29,8 +29,8 @@ public enum Keyword {
 	IMMUNITE_CONTRE_ORGANIC("",5),
 	IMMUNITE_CONTRE_NOMAD("",5),
 	IMMUNITE_CONTRE_MECHANICAL("",5),
-	IMMUNITE_CONTRE_OCCULT("",5);
-	
+	IMMUNITE_CONTRE_OCCULT("",5),
+	SANGUINAIRE("Ne peut pas attaquer le PC adverse",-0); //A rajouter : ne peut attaquer que les structure et unité
 //imunite contre X
 	
     private final String description;
@@ -101,6 +101,7 @@ public enum Keyword {
             	if (this == TRAMPLE) return false;
             	if (this == FIRST_STRIKE) return false;
             	if (this == INSAISISSABLE) return false;
+            	if (this == SANGUINAIRE) return false;
             	
             	return true;
             case ACTION : return false;
@@ -142,7 +143,8 @@ public enum Keyword {
 
             case FIRST_STRIKE:
                 return atk * 3;
-
+            case SANGUINAIRE:
+                return -(atk * 3);    
            
             default:
                 return this.generatorWeight;

@@ -32,7 +32,7 @@ public class CardEffect {
     
     private final Set<TargetConstraint> constraints;
     
-    private static int MODIFIER_CONTRAINTE_NEGATIVE = -40; //exprimé en %, arbitraire pour le moment
+    private static int MODIFIER_CONTRAINTE_NEGATIVE = -30; //exprimé en %, arbitraire pour le moment
     
     public Set<TargetConstraint> getConstraints() {
 		return constraints;
@@ -156,8 +156,10 @@ public class CardEffect {
         }
         // 4️⃣ TargetType
         TargetType targetType = switch (ability) {
-            case BUFF, MOVE_ALLY -> TargetType.ALLY;
-            case DAMAGE_UNIT_ENEMY, MOVE_ENEMY, DEBUFF_ENEMY,ENERGY_LOSS_ENEMY,ENERGY_GAIN_ENEMY,DISCARD_ENEMY,DESTROY_STRUCTURE_ENEMY,DESTROY_UNIT_ENEMY -> TargetType.ENEMY;
+            case BUFF, MOVE_ALLY,TAP_ALLY,UNTAP_ALLY -> TargetType.ALLY;
+            case 	DAMAGE_UNIT_ENEMY, MOVE_ENEMY, DEBUFF_ENEMY,ENERGY_LOSS_ENEMY,
+            		ENERGY_GAIN_ENEMY,DISCARD_ENEMY,DESTROY_STRUCTURE_ENEMY,
+            		DESTROY_UNIT_ENEMY,TAP_ENEMY,UNTAP_ENEMY -> TargetType.ENEMY;
             default -> TargetType.SELF;
         };
 
@@ -181,7 +183,7 @@ public class CardEffect {
         // 6️⃣ Contraintes
      // Contraintes obligatoires (ex : UNIT / STRUCTURE)
         Set<TargetConstraint> constraints = new HashSet<>();
-        constraints.addAll(ability.getMandatoryConstraints());
+        //constraints.addAll(ability.getMandatoryConstraints());
 
    
         
@@ -260,7 +262,7 @@ public class CardEffect {
     
     public String toDisplayString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("("+this.computeRawPower()+")");
+        sb.append("("+this.computeRawPower()+":"+this.getTrigger().getWeight()+"/"+this.getAbility().getWeight()+"/"+this.getValue()+")");
         // Trigger
         
         
@@ -290,6 +292,9 @@ public class CardEffect {
     public String getEffectText() {
         StringBuilder sb = new StringBuilder();
         sb.append(": ("+(int)Math.round(this.computeRawPower())+") ");
+        
+        //A conserver pour debug puissance d'un Effect
+        //sb.append("("+(int)Math.round(this.computeRawPower())+":"+this.getTrigger().getWeight()+"/"+this.getAbility().getWeight()+"/"+this.getValue()+"/"+this.getConstraints().size());
         
 
         String text = ability.buildText(value);
@@ -333,27 +338,7 @@ public class CardEffect {
 
 
     
-    /**
-     * Calcul la valeur relative de l'effet en fonction du cout en energie
-     * @param energyCost
-     * @return
-     */
-    @Deprecated
-    public double computeRelativePower(int energyCost) {
-        double raw =
-                trigger.getWeight()
-              + (ability.getWeight()
-              * (value != null ? value : 1));
-
-        double modifier = 100;//pour 100%
-        for (TargetConstraint c : constraints) {
-            modifier += c.getPowerModifier(); // ex: -15
-        }
-        modifier =modifier/100;
-        double costFactor = Math.sqrt(Math.max(1, energyCost));
-
-        return (raw * modifier) / costFactor;
-    }
+   
     /**
      * calcul brute de la puissance
      * @return
@@ -363,12 +348,16 @@ public class CardEffect {
     	if (ability.isNegativeForOwner()) trigger_weight =-trigger_weight;
         double raw =
         		trigger_weight
-              + (ability.getWeight()
-              * (value != null ? value : 1));
+              + (ability.getWeight()*getValue());
+              //* (value != null ? value : 1));
 
         double modifier = 100;//pour 100%
-        for (TargetConstraint c : constraints) {
+        for (TargetConstraint c : getConstraints()) {
+        	
             modifier += c.getPowerModifier(); // ex: -15
+            if (ability.requiresTarget() && targetType == TargetType.ENEMY) {//cible une carte ennemy
+            	modifier+=MODIFIER_CONTRAINTE_NEGATIVE;//valeur arbitraire temporaire
+            }
             if (ability.isNegativeForOwner()) modifier+=MODIFIER_CONTRAINTE_NEGATIVE;//valeur arbitraire temporaire
         }
         modifier =modifier/100;

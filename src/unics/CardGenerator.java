@@ -127,7 +127,11 @@ public abstract class CardGenerator {
         // 3️⃣ Stats
         Integer attack = INITIAL_ATK;
         Integer defense = INITIAL_DEF;
-
+        if (type == CardType.UNIT) {//eviter la règle si une carte peut attaquer en ayant 0 de force
+        	attack++;
+        	remainingBudget=initialBudget-calculBudgetSpent(attack,defense,keywords,effects,energyCost);
+        }
+        	
         if (type == CardType.UNIT || type == CardType.STRUCTURE) {
 
             // Défense minimale vitale

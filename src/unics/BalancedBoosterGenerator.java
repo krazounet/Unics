@@ -12,12 +12,11 @@ public class BalancedBoosterGenerator {
 
 	static ThreadLocalRandom random = ThreadLocalRandom.current();
 	
-	//private static List<Integer> manaCurve;
-
-	static boolean MAKE_IA_IMAGE=true;
+	static boolean MAKE_IA_IMAGE=false;
 			
 	static int nb_booster=15;
-	// Exemple main pour test
+	
+	
     public static void main(String[] args) throws Exception {
     	
         try {

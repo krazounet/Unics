@@ -15,7 +15,7 @@ public enum AbilityType {
         "Le joueur défausse X cartes",
         -15,
         false,
-        EnumSet.noneOf(TargetConstraint.class),
+        EnumSet.allOf(TargetConstraint.class),
         EnumSet.noneOf(TargetConstraint.class)
     ),
 
@@ -24,7 +24,7 @@ public enum AbilityType {
         "L’adversaire défausse X cartes",
         20,
         false,
-        EnumSet.noneOf(TargetConstraint.class),
+        EnumSet.allOf(TargetConstraint.class),
         EnumSet.noneOf(TargetConstraint.class)
     ),
 
@@ -35,16 +35,16 @@ public enum AbilityType {
         "Inflige des dégâts à une unité ciblée",
         15,
         true,
-        EnumSet.of(TargetConstraint.UNIT),
-        EnumSet.of(TargetConstraint.STRUCTURE)
+        EnumSet.allOf(TargetConstraint.class),
+        EnumSet.noneOf(TargetConstraint.class)
     ),
     DAMAGE_UNIT_ALLY(
             "Dégâts unité amie",
             "Inflige des dégâts à une unité ciblée",
             -10,
             true,
-            EnumSet.of(TargetConstraint.UNIT),
-            EnumSet.of(TargetConstraint.STRUCTURE)
+            EnumSet.allOf(TargetConstraint.class),
+            EnumSet.noneOf(TargetConstraint.class)
         ),
 
     DAMAGE_PC_SELF(
@@ -52,16 +52,17 @@ public enum AbilityType {
         "Inflige des dégâts aux points de commandement",
         -10,
         false,
-        EnumSet.noneOf(TargetConstraint.class),
-        EnumSet.allOf(TargetConstraint.class)
+        EnumSet.allOf(TargetConstraint.class),
+        EnumSet.noneOf(TargetConstraint.class)
     ),
     DAMAGE_PC_ENEMY(
             "Dégâts PC Enemy",
             "Inflige des dégâts aux points de commandement",
             25,
             false,
-            EnumSet.noneOf(TargetConstraint.class),
-            EnumSet.allOf(TargetConstraint.class)
+            EnumSet.allOf(TargetConstraint.class),
+            EnumSet.noneOf(TargetConstraint.class)
+            
         ),
 
     HEAL_PC(
@@ -69,8 +70,8 @@ public enum AbilityType {
         "Restaure des points de commandement",
         20,
         false,
-        EnumSet.noneOf(TargetConstraint.class),
-        EnumSet.allOf(TargetConstraint.class)
+        EnumSet.allOf(TargetConstraint.class),
+        EnumSet.noneOf(TargetConstraint.class)
     ),
 
     // ──────────────── Stats ────────────────
@@ -80,8 +81,8 @@ public enum AbilityType {
         "Augmente temporairement les statistiques d’une unité",
         12,
         true,
-        EnumSet.of(TargetConstraint.UNIT),
-        EnumSet.of(TargetConstraint.STRUCTURE)
+        EnumSet.allOf(TargetConstraint.class),
+        EnumSet.noneOf(TargetConstraint.class)
     ),
 
     DEBUFF_ENEMY(
@@ -89,16 +90,16 @@ public enum AbilityType {
         "Réduit temporairement les statistiques d’une unité ennemie",
         12,
         true,
-        EnumSet.of(TargetConstraint.UNIT),
-        EnumSet.of(TargetConstraint.STRUCTURE)
+        EnumSet.allOf(TargetConstraint.class),
+        EnumSet.noneOf(TargetConstraint.class)
     ),
     DEBUFF_ALLY(
             "Debuff unité amie",
             "Réduit temporairement les statistiques d’une unité amie",
             -5,
             true,
-            EnumSet.of(TargetConstraint.UNIT),
-            EnumSet.of(TargetConstraint.STRUCTURE)
+            EnumSet.allOf(TargetConstraint.class),
+            EnumSet.noneOf(TargetConstraint.class)
         ),
     // ──────────────── Cartes ────────────────
 
@@ -107,7 +108,7 @@ public enum AbilityType {
         "Le joueur pioche X cartes",
         15,
         false,
-        EnumSet.noneOf(TargetConstraint.class),
+        EnumSet.allOf(TargetConstraint.class),
         EnumSet.noneOf(TargetConstraint.class)
     ),
 
@@ -116,16 +117,16 @@ public enum AbilityType {
         "Détruit une unité",
         50,
         true,
-        EnumSet.of(TargetConstraint.UNIT ),
-        EnumSet.of(TargetConstraint.STRUCTURE)
+        EnumSet.allOf(TargetConstraint.class),
+        EnumSet.noneOf(TargetConstraint.class)
     ),
     DESTROY_STRUCTURE_ENEMY(
             "Destruction",
             "Détruit une unité",
             30,
             true,
-            EnumSet.of( TargetConstraint.STRUCTURE),
-            EnumSet.of(TargetConstraint.UNIT)
+            EnumSet.allOf(TargetConstraint.class),
+            EnumSet.noneOf(TargetConstraint.class)
         ),
 
 
@@ -136,8 +137,8 @@ public enum AbilityType {
         "Déplace une unité alliée",
         10,
         true,
-        EnumSet.of(TargetConstraint.UNIT),
-        EnumSet.of(TargetConstraint.STRUCTURE)
+        EnumSet.allOf(TargetConstraint.class),
+        EnumSet.noneOf(TargetConstraint.class)
     ),
 
     MOVE_ENEMY(
@@ -145,8 +146,8 @@ public enum AbilityType {
         "Déplace une unité ennemie",
         10,
         true,
-        EnumSet.of(TargetConstraint.UNIT),
-        EnumSet.of(TargetConstraint.STRUCTURE)
+        EnumSet.allOf(TargetConstraint.class),
+        EnumSet.noneOf(TargetConstraint.class)
     ),
 
     // ──────────────── Énergie ────────────────
@@ -156,7 +157,7 @@ public enum AbilityType {
         "Le joueur gagne X énergie",
         15,
         false,
-        EnumSet.noneOf(TargetConstraint.class),
+        EnumSet.allOf(TargetConstraint.class),
         EnumSet.noneOf(TargetConstraint.class)
     ),
 
@@ -165,7 +166,7 @@ public enum AbilityType {
         "L’adversaire gagne X énergie",
         -15,
         false,
-        EnumSet.noneOf(TargetConstraint.class),
+        EnumSet.allOf(TargetConstraint.class),
         EnumSet.noneOf(TargetConstraint.class)
     ),
 
@@ -174,7 +175,7 @@ public enum AbilityType {
         "Le joueur perd X énergie",
         -15,
         false,
-        EnumSet.noneOf(TargetConstraint.class),
+        EnumSet.allOf(TargetConstraint.class),
         EnumSet.noneOf(TargetConstraint.class)
     ),
 
@@ -183,7 +184,7 @@ public enum AbilityType {
         "L’adversaire perd X énergie",
         20,
         false,
-        EnumSet.noneOf(TargetConstraint.class),
+        EnumSet.allOf(TargetConstraint.class),
         EnumSet.noneOf(TargetConstraint.class)
     ),
 	//
@@ -192,33 +193,33 @@ public enum AbilityType {
 	        "Incline un ennemi",
 	        "Incline un ennemi",
 	        25,
-	        false,
-	        EnumSet.noneOf(TargetConstraint.class),
-	        EnumSet.noneOf(TargetConstraint.class)
+	        true,
+	        EnumSet.allOf(TargetConstraint.class),
+            EnumSet.noneOf(TargetConstraint.class)
 	    ),
 	TAP_ALLY(
 	        "Incline un allié",
 	        "Incline un allié",
 	        -25,
-	        false,
-	        EnumSet.noneOf(TargetConstraint.class),
-	        EnumSet.noneOf(TargetConstraint.class)
+	        true,
+	        EnumSet.allOf(TargetConstraint.class),
+            EnumSet.noneOf(TargetConstraint.class)
 	    ),
 	UNTAP_ENEMY(
 	        "Redresse un ennemi",
 	        "Redresse un ennemi",
-	        25,
-	        false,
-	        EnumSet.noneOf(TargetConstraint.class),
-	        EnumSet.noneOf(TargetConstraint.class)
+	        -25,
+	        true,
+	        EnumSet.allOf(TargetConstraint.class),
+            EnumSet.noneOf(TargetConstraint.class)
 	    ),
 	UNTAP_ALLY(
 	        "Redresse un allié",
 	        "Redresse un allié",
 	        25,
 	        false,
-	        EnumSet.noneOf(TargetConstraint.class),
-	        EnumSet.noneOf(TargetConstraint.class)
+	        EnumSet.allOf(TargetConstraint.class),
+            EnumSet.noneOf(TargetConstraint.class)
 	    );
     private final String displayName;
     private final String description;
@@ -407,6 +408,10 @@ public enum AbilityType {
     	case DESTROY_STRUCTURE_ENEMY : 	return 2;
     	case MOVE_ALLY :				return 2;
     	case MOVE_ENEMY : 				return 2;
+    	case TAP_ALLY :					return 2;
+    	case UNTAP_ALLY :				return 2;
+    	case TAP_ENEMY :				return 2;
+    	case UNTAP_ENEMY :				return 2;
     	
 		default:return 100;
 			

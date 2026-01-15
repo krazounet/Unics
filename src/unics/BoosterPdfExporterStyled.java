@@ -46,12 +46,12 @@ import com.itextpdf.layout.element.Text;
 import unics.Enum.CardType;
 import unics.Enum.Faction;
 import unics.Enum.Keyword;
-import unics.Enum.TriggerType;
+
 
 public class BoosterPdfExporterStyled {
 
     // Magic size
-    private static final float CARD_WIDTH = 178.6f;
+   //O private static final float CARD_WIDTH = 178.6f;
     private static final float CARD_HEIGHT = 249.4f;
     static final float ILLUSTRATION_HEIGHT = 80f;
     static final float ILLUSTRATION_WIDTH = 100f;
@@ -611,76 +611,7 @@ public class BoosterPdfExporterStyled {
         return ImageDataFactory.create(baos.toByteArray());
     }
 
-    private static Image triggerIconOrNull(TriggerType trigger, float size) {
-        String resourcePath = "/images/icons/trigger/" + trigger.name() + ".png";
-
-        try {
-            var stream = BoosterPdfExporterStyled.class.getResourceAsStream(resourcePath);
-            if (stream == null) {
-            	System.out.println(resourcePath);
-                return null; // icône absente → fallback texte
-            }
-
-            ImageData data = ImageDataFactory.create(stream.readAllBytes());
-            Image img = new Image(data);
-            img.setWidth(size);
-            img.setHeight(size);
-            img.setAutoScale(false);
-            img.setBorder(Border.NO_BORDER);
-            img.setMarginRight(4);
-
-            return img;
-
-        } catch (IOException e) {
-            return null; // sécurité absolue
-        }
-    }
-
-    private static Table triggerIconChipOrNull(
-            TriggerType trigger,
-            float fontSize,
-            Color backgroundColor
-    ) {
-        String resourcePath = "/images/icons/trigger/" + trigger.name() + ".png";
-
-        try (var stream = BoosterPdfExporterStyled.class.getResourceAsStream(resourcePath)) {
-
-            if (stream == null) {
-                return null;
-            }
-
-            float iconSize = fontSize + 1;
-
-            ImageData data = ImageDataFactory.create(stream.readAllBytes());
-            Image icon = new Image(data)
-                    .setWidth(iconSize)
-                    .setHeight(iconSize)
-                    .setBorder(Border.NO_BORDER);
-
-            Cell cell = new Cell()
-                    .setBorder(Border.NO_BORDER)
-                    .setBackgroundColor(backgroundColor)
-                    .setPaddingLeft(1.5f)
-                    .setPaddingRight(1.5f)
-                    .setPaddingTop(0.8f)
-                    .setPaddingBottom(1.2f)
-                    .setTextAlignment(TextAlignment.CENTER)
-                    .setVerticalAlignment(VerticalAlignment.MIDDLE)
-                    .add(icon);
-
-            Table chip = new Table(1)
-                    .setWidth(iconSize + 3)
-                    .setBorder(Border.NO_BORDER)
-                    .setMarginRight(4);
-
-            chip.addCell(cell);
-
-            return chip;
-
-        } catch (IOException e) {
-            return null;
-        }
-    }
+   
 
 
     private static Image createIcon(String path) throws MalformedURLException {

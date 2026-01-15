@@ -189,6 +189,9 @@ public class CardPromptGenerator {
 
             case IMMUNITE_CONTRE_OCCULT ->
                 "runic seals or sacred light blocking occult magic";
+                
+            case SANGUINAIRE ->
+            	"blood-infused energy, crimson glow around the character, empowered by recent violence, aggressive and relentless aura";
 		default -> throw new IllegalArgumentException("Unexpected value: " + keyword);
         };
     }
@@ -266,10 +269,23 @@ public class CardPromptGenerator {
                 "energy siphon draining the enemy's reserves";
 
             case DISCARD_SELF ->
-                "";
-            case DISCARD_ENEMY ->
-            "";
-            case TAP_ALLY,UNTAP_ALLY,TAP_ENEMY,UNTAP_ENEMY -> "";
+            "volatile energy being sacrificed or released, fragments dissolving into the void";
+
+        case DISCARD_ENEMY ->
+            "enemy resources collapsing or burning away, stolen or destroyed tactical options";
+
+        case TAP_ALLY ->
+        "allied unit restrained or exhausted, glowing restraints or powered-down stance";
+
+    case UNTAP_ALLY ->
+        "allied unit reactivated, energy surging back, ready stance restored";
+
+    case TAP_ENEMY ->
+        "enemy unit immobilized or suppressed, energy locks or disabling field";
+
+    case UNTAP_ENEMY ->
+        "enemy unit freed from restraints, systems reactivating or stance recovering";
+
             
 		default -> throw new IllegalArgumentException("Unexpected value: " + ability);
         };
