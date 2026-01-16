@@ -4,6 +4,12 @@ import java.util.*;
 
 import unics.Enum.Faction;
 
+
+/**
+ * Défnit les N factions qui seront dans le booster
+ * les Integer dans la liste indiquent le nb de chaque cartes de chaque faction
+ * 
+ */
 public class FactionDistribution {
 
     private static final Random RNG = new Random();
