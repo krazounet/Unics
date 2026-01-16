@@ -12,6 +12,8 @@ import unics.Enum.Keyword;
 public final class CardBuilder {
 
     private UUID id;
+    private String publicId;
+    private String name;
     private Faction faction;
     private CardType type;
     private Set<Keyword> keywords;
@@ -23,9 +25,33 @@ public final class CardBuilder {
     
     public CardBuilder() {
         // valeurs par défaut
-        this.id = UUID.randomUUID();
+        //this.id = UUID.randomUUID();
+    	
     }
-
+    public CardBuilder withRandomUuid() {
+    	this.id = UUID.randomUUID();
+    	return this;
+    }
+    public CardBuilder withId(UUID id) {
+    	this.id=id;
+    	return this;
+    }
+    public CardBuilder withGeneratePublicID() {
+    	this.publicId=PublicIdGenerator.fromUuid(id);
+    	return this;
+    }
+    public CardBuilder withPublicId(String publicId) {
+    	this.publicId=publicId;
+    	return this;
+    }
+    public CardBuilder withGeneratename() {
+    	this.name=CardNameGenerator.generateName(faction, type, publicId, keywords);
+    	return this;
+    }
+    public CardBuilder withName(String name) {
+    	this.name=name;
+    	return this;
+    }
     public CardBuilder withFaction(Faction faction) {
         this.faction = faction;
         return this;
@@ -78,8 +104,8 @@ public final class CardBuilder {
             throw new IllegalStateException("CardType doit être défini");
         }
         //this.id = UUID.randomUUID();
-        String publicId = PublicIdGenerator.fromUuid(id);
-        String name = CardNameGenerator.generateName(faction, type, publicId, keywords);
+        //String publicId = PublicIdGenerator.fromUuid(id);
+        //String name = CardNameGenerator.generateName(faction, type, publicId, keywords);
 
      // 1️⃣ Construire l'identité gameplay
         CardIdentity identity = new CardIdentity(

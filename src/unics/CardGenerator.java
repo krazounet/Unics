@@ -166,6 +166,8 @@ public abstract class CardGenerator {
 
         // 5️⃣ Build final
         return new CardBuilder()
+        		.withRandomUuid()
+        		.withGeneratePublicID()
                 .withFaction(faction)
                 .withType(type)
                 .withEnergyCost(energyCost)
@@ -174,6 +176,7 @@ public abstract class CardGenerator {
                 .withAttack(attack)
                 .withDefense(defense)
                 .withPowerScore(powerScore)
+                .withGeneratename()//ordre important.
                 .build();
     }
 

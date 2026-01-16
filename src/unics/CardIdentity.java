@@ -67,4 +67,16 @@ public final class CardIdentity {
             "EFFECTS=" + effectsPart
         );
     }
+    @Override
+    public String toString() {
+        return computeHash(); // ou le hash final
+    }
+    /**
+     * Représentation lisible de l'identité.
+     * ⚠️ Destinée uniquement au debug / logs / inspection humaine.
+     * ⚠️ Ne pas utiliser pour la persistance ou les comparaisons.
+     */
+    public String debugSignature() {
+        return buildSignature();
+    }
 }

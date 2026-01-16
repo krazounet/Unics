@@ -56,4 +56,5 @@ public class CardIdentityBuilder {
             type, faction, energyCost, atk, def, keywords, effects
         );
     }
+    
 }
