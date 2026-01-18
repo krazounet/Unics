@@ -13,7 +13,7 @@ import unics.Enum.Keyword;
 
 public abstract class CardGenerator {
 
-	private static int BUDGET_BASE=36;
+	private static int BUDGET_BASE=20;//parti à 36
 	private static int BUDGET_PER_ENERGY=24;
 	
 	private static int PCT_0_KEYWORD=15;

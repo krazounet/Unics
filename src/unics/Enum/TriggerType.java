@@ -7,133 +7,133 @@ public enum TriggerType {
     ON_PLAY(
         "À la pose",
         "La capacité se déclenche lorsqu’une carte est jouée depuis la main",
-        20,
+        0,
         EnumSet.of(CardType.ACTION, CardType.UNIT, CardType.STRUCTURE)
     ),
 
     ON_ENTER(
         "À l’arrivée en jeu",
         "La capacité se déclenche lorsqu’une carte arrive sur le plateau",
-        20,
+        0,
         EnumSet.of(CardType.UNIT, CardType.STRUCTURE)
     ),
 
     ON_TURN_START(
         "Au début du tour",
         "La capacité se déclenche au début du tour du joueur",
-        15,
+        -5,
         EnumSet.of(CardType.UNIT, CardType.STRUCTURE)
     ),
 
-    ON_TURN_END(
+    ON_TURN_END(//va forcément se trigger 1 fois comme les précédents, peut être deux fois 
         "À la fin du tour",
         "La capacité se déclenche à la fin du tour du joueur",
-        15,
+        10,
         EnumSet.of(CardType.UNIT, CardType.STRUCTURE)
     ),
 
-    ON_ATTACK(
+    ON_ATTACK(//moins probable car il faut avoir survécu
         "À l’attaque",
         "La capacité se déclenche lorsque la carte attaque",
-        18,
+        -5,
         EnumSet.of(CardType.UNIT)
     ),
 
     AFTER_DAMAGE(
         "Après avoir infligé des dégâts",
         "La capacité se déclenche après que cette carte a infligé des dégâts",
-        15,
+        -5,
         EnumSet.of(CardType.UNIT)
     ),
 
-    ON_BEING_ATTACKED(
+    ON_BEING_ATTACKED(//rien n'indique qu'elle sera attaquée sauf les structures... le cout devrait peut être est dépendant des KW
         "Lorsqu’elle est attaquée",
         "La capacité se déclenche lorsqu’une unité ennemie attaque cette carte",
-        15,
+        -10,
         EnumSet.of(CardType.UNIT, CardType.STRUCTURE)
     ),
 
-    AFTER_RECEIVE_DAMAGE(
+    AFTER_RECEIVE_DAMAGE(//idem au dessus
         "Après que cette carte ait subi des dégâts",
         "La capacité se déclenche après que cette carte a subi des dégâts",
-        15,
+        -10,
         EnumSet.of(CardType.UNIT, CardType.STRUCTURE)
     ),
 
-    ON_DEATH(
+    ON_DEATH(//elle peut mourrir de sa belle mort. interaction avec persisant, bouclier, fragile
         "À la destruction",
         "La capacité se déclenche lorsque la carte est retirée après avoir subi des dégâts",
-        18,
+        -10,
         EnumSet.of(CardType.UNIT, CardType.STRUCTURE)
     ),
 
-    ON_LEAVE(
+    ON_LEAVE(//interaction avec persistant
         "En quittant le plateau",
         "La capacité se déclenche lorsque la carte quitte le plateau pour une autre raison que la mort",
-        10,
+        0,
         EnumSet.of(CardType.UNIT, CardType.STRUCTURE)
     ),
 
-    ON_MOVE(
+    ON_MOVE(//interaction avec mobile
         "Lors d’un déplacement",
         "La capacité se déclenche lorsqu’une carte change de position",
-        10,
+        -20,
         EnumSet.of(CardType.UNIT)
     ),
 
     POSITION_FRONT(
         "En position avant",
         "La capacité se déclenche uniquement si la carte est en position avant",
-        10,
+        -5,
         EnumSet.of(CardType.UNIT)
     ),
 
     POSITION_MIDDLE(
         "En position centrale",
         "La capacité se déclenche uniquement si la carte est en position milieu",
-        8,
+        -5,
         EnumSet.of(CardType.UNIT)
     ),
 
     POSITION_BACK(
         "En position arrière",
         "La capacité se déclenche uniquement si la carte est en position arrière",
-        8,
+        -5,
         EnumSet.of(CardType.UNIT)
     ),
 
     ON_ACTIVATION(
         "Activation",
         "La capacité se déclenche quand le joueur choisit de l’activer",
-        20,
+        0,
         EnumSet.of(CardType.UNIT, CardType.STRUCTURE)
     ),
 
     KEYWORD_PRESENT(
         "Si un mot-clé est présent",
         "La capacité se déclenche si une autre carte possède un mot-clé spécifique",
-        12,
+        -10,
         EnumSet.of(CardType.UNIT, CardType.STRUCTURE)
     ),
 
     ALLIED_UNIT_PRESENT(
         "Si une unité alliée est en jeu",
         "La capacité se déclenche si une unité alliée spécifique est présente",
-        12,
+        -10,
         EnumSet.of(CardType.UNIT, CardType.STRUCTURE)
     ),
 
     NO_ENEMY_UNITS(
         "Si le plateau adverse est vide",
         "La capacité se déclenche uniquement si aucune unité ennemie n’est en jeu",
-        10,
+        -10,
         EnumSet.of(CardType.UNIT, CardType.STRUCTURE)
     ),
 
     PC_DAMAGED(
         "Quand vous perdez des PC ",
         "La capacité se déclenche lorsque les points de commandement changent",
-        15,
+        -10,
         EnumSet.of(CardType.UNIT)// Structure retirée, car le calcul de la puissance n'avait aucun sens.
     );
 

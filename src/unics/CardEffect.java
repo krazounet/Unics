@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 import unics.Enum.AbilityType;
@@ -241,8 +240,8 @@ public class CardEffect {
     ) {
         return switch (cardType) {
             case UNIT -> true;
-            case STRUCTURE -> ability != AbilityType.MOVE_ENEMY
-                    && ability != AbilityType.MOVE_ALLY;
+            case STRUCTURE -> 	ability != AbilityType.MOVE_ENEMY
+                    			&& ability != AbilityType.MOVE_ALLY;
             //les cartes actions ne font pas de trucs négatifs pour le joueur en cours
             case ACTION -> ability != AbilityType.BUFF
                     && ability != AbilityType.DEBUFF_ALLY && !ability.isNegativeForOwner();
@@ -352,6 +351,8 @@ public class CardEffect {
               + (ability.getWeight()*getValue());
               //* (value != null ? value : 1));
 
+        if (ability.isNegativeForOwner() && raw >0)raw=0; //protection contre un effet négatif qui couerait des stats
+        
         double modifier = 100;//pour 100%
         for (TargetConstraint c : getConstraints()) {
         	

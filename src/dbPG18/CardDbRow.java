@@ -1,14 +1,9 @@
 package dbPG18;
 
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
-import unics.Card;
-import unics.CardBuilder;
 import unics.Enum.CardType;
 import unics.Enum.Faction;
-import unics.Enum.Keyword;
 
 public final class CardDbRow {
 

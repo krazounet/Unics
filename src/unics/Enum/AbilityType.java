@@ -22,7 +22,7 @@ public enum AbilityType {
     DISCARD_ENEMY(
         "Défausse (ennemi)",
         "L’adversaire défausse X cartes",
-        20,
+        40,
         false,
         EnumSet.allOf(TargetConstraint.class),
         EnumSet.noneOf(TargetConstraint.class)
@@ -79,7 +79,7 @@ public enum AbilityType {
     BUFF(
         "Buff",
         "Augmente temporairement les statistiques d’une unité",
-        12,
+        15,
         true,
         EnumSet.allOf(TargetConstraint.class),
         EnumSet.noneOf(TargetConstraint.class)
@@ -88,7 +88,7 @@ public enum AbilityType {
     DEBUFF_ENEMY(
         "Debuff unité ennemie",
         "Réduit temporairement les statistiques d’une unité ennemie",
-        12,
+        15,
         true,
         EnumSet.allOf(TargetConstraint.class),
         EnumSet.noneOf(TargetConstraint.class)
@@ -96,7 +96,7 @@ public enum AbilityType {
     DEBUFF_ALLY(
             "Debuff unité amie",
             "Réduit temporairement les statistiques d’une unité amie",
-            -5,
+            -10,
             true,
             EnumSet.allOf(TargetConstraint.class),
             EnumSet.noneOf(TargetConstraint.class)
@@ -115,7 +115,7 @@ public enum AbilityType {
     DESTROY_UNIT_ENEMY(
         "Destruction Structure",
         "Détruit une unité",
-        50,
+        60,
         true,
         EnumSet.allOf(TargetConstraint.class),
         EnumSet.noneOf(TargetConstraint.class)
@@ -274,21 +274,21 @@ public enum AbilityType {
         return switch (this) {
             case DEBUFF_ENEMY, DEBUFF_ALLY,BUFF -> EnumSet.of(
                 TriggerType.ON_ATTACK,
-                TriggerType.ON_BEING_ATTACKED,
+                TriggerType.ON_BEING_ATTACKED,  
                 TriggerType.ON_ENTER,
                 TriggerType.ON_ACTIVATION,
                 TriggerType.AFTER_DAMAGE,
                 TriggerType.ON_TURN_START,
                 TriggerType.ON_PLAY
             );
-            
+            //case BUFF -> EnumSet.of();
             default -> EnumSet.allOf(TriggerType.class);
         };
     }
     
     public EnumSet<TriggerType> getForbiddenTriggers(CardType cardType) {
     	return switch (this) {
-    	case TAP_ENEMY,UNTAP_ENEMY -> EnumSet.of(
+    	case TAP_ENEMY,UNTAP_ENEMY,DESTROY_STRUCTURE_ENEMY,DESTROY_UNIT_ENEMY,DAMAGE_UNIT_ENEMY,DEBUFF_ENEMY,MOVE_ENEMY -> EnumSet.of(
     			TriggerType.NO_ENEMY_UNITS
     			);
     	default -> EnumSet.noneOf(TriggerType.class);

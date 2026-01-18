@@ -11,14 +11,14 @@ import unics.Enum.Faction;
 
 public final class CardIdentity {
 
-    public static final int GENERATION_VERSION = 1;
+    public static final int GENERATION_VERSION = 1; //logique d’identité gameplay
 
     private final CardType type;
     private final Faction faction;
     private final int energyCost;
     private final int atk;
     private final int def;
-    private final List<String> keywords;
+    private final List<String> keywords;  	//volontairement decouplé des Enums
     private final List<CardEffect> effects;
 
     public CardIdentity(
@@ -39,11 +39,20 @@ public final class CardIdentity {
         this.effects = List.copyOf(effects == null ? List.of() : effects);
     }
 
-    public String computeHash() {
+    public String computeSignatureHash() {
         return DigestUtils.sha256Hex(buildSignature());
     }
+    /**
+     * ⚠️ MÉTHODE CRITIQUE ⚠️
+     *
+     * Cette signature représente l'identité GAMEPLAY d'une carte.
+     * Toute modification de cette méthode est un BREAKING CHANGE :
+     * - elle invalide les doublons
+     * - elle casse la compatibilité des snapshots existants
+     * - elle change l'historique de génération
+     */
 
-    private String buildSignature() {
+    public String buildSignature() {
 
         String keywordsPart = keywords.stream()
             .map(k -> k.trim().toLowerCase())
@@ -69,7 +78,7 @@ public final class CardIdentity {
     }
     @Override
     public String toString() {
-        return computeHash(); // ou le hash final
+        return computeSignatureHash(); // ou le hash final
     }
     /**
      * Représentation lisible de l'identité.

@@ -14,7 +14,7 @@ public class BalancedBoosterGenerator {
 	
 	static boolean MAKE_IA_IMAGE=false;
 			
-	static int nb_booster=15;
+	static int nb_booster=5;
 	
 	
     public static void main(String[] args) throws Exception {

@@ -1,11 +1,13 @@
 package unics;
 
-import unics.Enum.*;
-
-import java.awt.RenderingHints.Key;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
+
+import unics.Enum.AbilityType;
+import unics.Enum.Faction;
+import unics.Enum.Keyword;
+import unics.Enum.TriggerType;
 
 /**
  * Registre central des profils de factions.

@@ -1,12 +1,17 @@
 package unics;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import unics.Enum.CardType;
 import unics.Enum.Faction;
 import unics.Enum.Keyword;
+import unics.snapshot.CardSnapshot;
+import unics.snapshot.EffectSnapshot;
+import unics.snapshot.SnapshotVersion;
 
 public final class Card {
 
@@ -78,4 +83,72 @@ public final class Card {
     public Set<Keyword> getKeywords() { return keywords; }
     public List<CardEffect> getEffects() { return effects; }
     public int getPowerScore() { return powerScore; }
+ // ==================================================
+    // FREEZE
+    // ==================================================
+    public CardSnapshot freeze() {
+
+        // 1️⃣ Effets figés
+        List<EffectSnapshot> effectSnapshots = effects.stream()
+            .map(e -> new EffectSnapshot(
+                e.getTrigger(),
+                e.getConditionKeyword(),
+                e.getAbility(),
+                e.getValue(),
+                e.getTargetType(),
+                e.getConstraints()
+            ))
+            .toList();
+
+        // 2️⃣ Texte FINAL (figé)
+        String rulesText = effects.stream()
+            .map(CardEffect::toDisplayString)
+            .collect(Collectors.joining("\n"));
+
+        // 3️⃣ Signature (source = CardIdentity)
+        String signature = identity.buildSignature();
+
+        // 4️⃣ PublicId (stable, exposable)
+        String snapshotPublicId = publicId != null
+            ? publicId
+            : signature.substring(0, 8);
+
+        return new CardSnapshot(
+        	    id,
+        	    snapshotPublicId,
+        	    signature,
+        	    SnapshotVersion.CURRENT,
+
+        	    cardType,
+        	    faction,
+        	    energyCost,
+        	    attack != null ? attack : 0,
+        	    defense != null ? defense : 0,
+        	    List.copyOf(keywords),   // ✅ ICI
+        	    effectSnapshots,
+
+        	    name,
+        	    rulesText,
+        	    null,
+
+        	    buildIllustrationPromptBase(),
+        	    buildFrameId(),
+
+        	    Instant.now(),
+        	    "card-generator-1.0",
+        	    SnapshotVersion.CURRENT
+        	);
+
+    }
+
+    // ==================================================
+    // RENDU (placeholder volontaire)
+    // ==================================================
+    private String buildIllustrationPromptBase() {
+        return name + ", " + faction + " " + cardType;
+    }
+
+    private String buildFrameId() {
+        return cardType.name().toLowerCase();
+    }
 }
