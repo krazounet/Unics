@@ -1,16 +1,16 @@
 package aiGenerated;
 
-
-
 import java.nio.file.*;
 import java.time.Instant;
-
-
 
 public final class ComfyUIWorker {
 
     private final ComfyUIClient client;
     private final Path imageRoot;
+
+    // ⚠️ dossier OUTPUT de ComfyUI
+    private final Path comfyOutputDir =
+        Path.of("C:/AI/ComfyUI_windows_portable/ComfyUI/output");
 
     public ComfyUIWorker(ComfyUIClient client, Path imageRoot) {
         this.client = client;
@@ -32,17 +32,15 @@ public final class ComfyUIWorker {
             String response =
                 client.sendPrompt(payload);
 
-            // ⚠️ Ici tu récupéreras le prompt_id
-            // puis tu polleras /history/{id}
-            // pour récupérer l’image finale
-            // (simplifié ici)
+            // 3️⃣ Attendre le fichier image ComfyUI
+            String filename =
+                waitAndFetchImageFile(response);
 
-            byte[] imageData = waitAndFetchImage(response);
+            // 4️⃣ Copier le fichier généré
+            Path imagePath =
+                copyImage(render, filename);
 
-            // 3️⃣ Sauvegarder l’image
-            Path imagePath = saveImage(render, imageData);
-
-            // 4️⃣ Retourner un render DONE
+            // 5️⃣ Retourner un render DONE
             return new CardRender(
                 render.renderId,
                 render.cardSnapshotId,
@@ -62,7 +60,9 @@ public final class ComfyUIWorker {
 
         } catch (Exception e) {
 
-            // 5️⃣ En cas d’erreur → FAILED
+            e.printStackTrace();
+
+            // 6️⃣ En cas d’erreur → FAILED
             return new CardRender(
                 render.renderId,
                 render.cardSnapshotId,
@@ -83,25 +83,53 @@ public final class ComfyUIWorker {
     }
 
     // ─────────────────────────────────────────────
-    // SIMPLIFICATION (à adapter)
+    // COMFYUI
     // ─────────────────────────────────────────────
 
-    private byte[] waitAndFetchImage(String promptResponse) {
-        // TODO :
-        // - extraire prompt_id
-        // - poll /history/{id}
-        // - récupérer l’image (base64 → bytes)
-        return new byte[0];
+    private String waitAndFetchImageFile(String promptResponse)
+        throws Exception {
+
+        String promptId =
+            ComfyUIResponseParser.extractPromptId(promptResponse);
+
+        return ComfyUIPoller.waitForImageFile(
+            client,
+            promptId,
+            600_000, // 10 minutes
+            1_000
+        );
     }
 
-    private Path saveImage(CardRender render, byte[] data) throws Exception {
+    // ─────────────────────────────────────────────
+    // FILE SYSTEM
+    // ─────────────────────────────────────────────
 
-        Path dir = imageRoot.resolve(render.cardSnapshotId.toString());
+    private Path copyImage(CardRender render, String filename)
+        throws Exception {
+
+        Path source =
+            comfyOutputDir.resolve(filename);
+
+        if (!Files.exists(source)) {
+            throw new IllegalStateException(
+                "ComfyUI image not found: " + source
+            );
+        }
+
+        Path dir =
+            imageRoot.resolve(render.cardSnapshotId.toString());
+
         Files.createDirectories(dir);
 
-        Path file = dir.resolve(render.renderId + ".png");
-        Files.write(file, data);
+        Path target =
+            dir.resolve(render.renderId + ".png");
 
-        return file;
+        Files.copy(
+            source,
+            target,
+            StandardCopyOption.REPLACE_EXISTING
+        );
+
+        return target;
     }
 }
