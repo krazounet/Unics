@@ -7,7 +7,7 @@ import unics.Enum.Faction;
 import unics.Enum.Keyword;
 import unics.Enum.TriggerType;
 
-@SuppressWarnings("unused")
+
 public final class FactionProfile {
 
     private final Faction faction;

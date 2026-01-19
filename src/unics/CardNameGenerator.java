@@ -41,9 +41,9 @@ public final class CardNameGenerator {
 			CardType.STRUCTURE, new String[]{"-tower","-fort","-wall","-spire","-dome","-outpost","-bastion","-keep","-citadel","-gate",
 			                        "-stronghold","-platform","-station","-bunker","-arch"},
 			CardType.ACTION, new String[]{"-burst","-veil","-flare","-wave","-hex","-strike","-blast","-shock","-shockwave","-eruption",
-			                     "-storm","-pulse","-beam","-flash","-flarex"},
-			CardType.TOKEN, new String[]{"-token","-promo","-sigil","-mark","-icon","-emblem","-glyph","-tag","-stamp","-badge",
-			                    "-symbol","-chip","-print","-mini","-tokenx"}
+			                     "-storm","-pulse","-beam","-flash","-flarex"}
+	//		CardType.TOKEN, new String[]{"-token","-promo","-sigil","-mark","-icon","-emblem","-glyph","-tag","-stamp","-badge",
+	//		                    "-symbol","-chip","-print","-mini","-tokenx"}
     );
 
     private CardNameGenerator() {

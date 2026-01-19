@@ -221,6 +221,12 @@ public enum AbilityType {
 	        EnumSet.allOf(TargetConstraint.class),
             EnumSet.noneOf(TargetConstraint.class)
 	    );
+	
+	/**
+	 * Silence
+	 * reveal hand
+	 * return to hand
+	 */
     private final String displayName;
     private final String description;
     private final int weight;

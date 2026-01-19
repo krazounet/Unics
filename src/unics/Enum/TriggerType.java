@@ -136,7 +136,10 @@ public enum TriggerType {
         -10,
         EnumSet.of(CardType.UNIT)// Structure retirée, car le calcul de la puissance n'avait aucun sens.
     );
-
+	/**
+	 * ON PLAY ADJACENT
+	 * ON TARGETED
+	 */
     // ──────────────────────────────
 
     private final String displayName;   // Pour l'affichage carte

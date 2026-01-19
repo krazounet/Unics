@@ -41,8 +41,21 @@ public abstract class CardGenerator {
   
     ) {
   
+    	
     }
-
+    
+    public static Card generateCard(ThreadLocalRandom random) {
+    	CardType type = randomCardType();
+    	Faction faction = randomFaction();
+    	int energyCost = random.nextInt(6)+1;
+    	return generateCard(type,energyCost,random,faction);
+    }
+    
+    public static Card generateCard(CardType type, ThreadLocalRandom random) {
+    	Faction faction = randomFaction();
+    	int energyCost = random.nextInt(6)+1;
+    	return generateCard(type,energyCost,random,faction);
+    }
     
     public static Card generateCard(CardType type, int energyCost, ThreadLocalRandom random) {
     	Faction faction = randomFaction();
@@ -201,7 +214,10 @@ public abstract class CardGenerator {
         Faction[] values = Faction.values();
         return values[ThreadLocalRandom.current().nextInt(values.length)];
     }
-
+	private static CardType randomCardType() {
+		CardType[] values = CardType.values();
+        return values[ThreadLocalRandom.current().nextInt(values.length)];
+    }
 	
 	
 	public static boolean isValid(Card card) {

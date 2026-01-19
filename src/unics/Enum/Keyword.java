@@ -31,7 +31,11 @@ public enum Keyword {
 	IMMUNITE_CONTRE_MECHANICAL("",5),
 	IMMUNITE_CONTRE_OCCULT("",5),
 	SANGUINAIRE("Ne peut pas attaquer le PC adverse",-0); //A rajouter : ne peut attaquer que les structure et unité
-//imunite contre X
+	/**
+	 * Unstable, si ciblé par un effet => détruite (dégats, buff/debuf, soin, )
+	 * Static, inciblable
+	 *  
+	 */
 	
     private final String description;
     private final int generatorWeight;
@@ -105,7 +109,7 @@ public enum Keyword {
             	
             	return true;
             case ACTION : return false;
-            case TOKEN : return false;
+            //case TOKEN : return false;
             default :
             	return true;
         }

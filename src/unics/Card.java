@@ -18,7 +18,7 @@ public final class Card {
     // Identité
     private final UUID id; 			//identifiant technique
     private final String publicId;	//identifiant exposé
-    private CardIdentity identity;	//unicité métier (éviter les doublons)
+    private final CardIdentity identity;	//unicité métier (éviter les doublons)
     
     private final String name;
 
