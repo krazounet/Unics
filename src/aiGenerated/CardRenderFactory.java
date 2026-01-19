@@ -37,7 +37,7 @@ public final class CardRenderFactory {
         // 3️⃣ Création du render PENDING
         return new CardRender(
             UUID.randomUUID(),           // renderId
-            snapshot.cardId,             // lien snapshot
+            snapshot.snapshotId,             // lien snapshot
             profile,                     // profil de rendu
 
             prompt,

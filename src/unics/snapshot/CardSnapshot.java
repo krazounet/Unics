@@ -8,8 +8,9 @@ import unics.Enum.*;
 
 public final class CardSnapshot {
 
-    // ===== IDENTITE =====
-    public final UUID cardId;
+	// ===== IDENTITE =====
+    public final UUID snapshotId;   // 🧊 ID du snapshot
+    public final UUID cardId;       // 🆔 ID de la card métier
     public final String publicId;
     public final String signature;
     public final int snapshotVersion;
@@ -38,6 +39,7 @@ public final class CardSnapshot {
     public final int schemaVersion;
 
     public CardSnapshot(
+    	UUID snapshotId,
         UUID cardId,
         String publicId,
         String signature,
@@ -62,6 +64,7 @@ public final class CardSnapshot {
         String generatorVersion,
         int schemaVersion
     ) {
+    	this.snapshotId = snapshotId;
         this.cardId = cardId;
         this.publicId = publicId;
         this.signature = signature;

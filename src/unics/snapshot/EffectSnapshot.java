@@ -2,6 +2,9 @@ package unics.snapshot;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import unics.Enum.AbilityType;
 import unics.Enum.Keyword;
 import unics.Enum.TargetConstraint;
@@ -37,4 +40,20 @@ public final class EffectSnapshot {
         this.targetType = targetType;
         this.constraints = Set.copyOf(constraints);
     }
+    @JsonCreator
+    public EffectSnapshot(
+        @JsonProperty("trigger") TriggerType trigger,
+        @JsonProperty("conditionKeyword") Keyword conditionKeyword,
+        @JsonProperty("ability") AbilityType ability,
+        @JsonProperty("value") int value,
+        @JsonProperty("targetType") TargetType targetType,
+        @JsonProperty("constraints") Set<TargetConstraint> constraints
+    ) {
+        this.trigger = trigger;
+        this.conditionKeyword = conditionKeyword;
+        this.ability = ability;
+        this.value = value;
+        this.targetType = targetType;
+        this.constraints = constraints;
+    };
 }

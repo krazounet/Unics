@@ -112,9 +112,10 @@ public final class Card {
         String snapshotPublicId = publicId != null
             ? publicId
             : signature.substring(0, 8);
-
+        UUID snapshotId = UUID.randomUUID();
         return new CardSnapshot(
-        	    id,
+        		snapshotId,
+        	    id, //id de la Carte
         	    snapshotPublicId,
         	    signature,
         	    SnapshotVersion.CURRENT,
