@@ -220,8 +220,15 @@ public enum AbilityType {
 	        false,
 	        EnumSet.allOf(TargetConstraint.class),
             EnumSet.noneOf(TargetConstraint.class)
+	    ),
+	RETURN_TO_HAND(
+	        "Renvoie une carte en main",
+	        "Renvoie une carte en main",
+	        25,
+	        false,
+	        EnumSet.allOf(TargetConstraint.class),
+            EnumSet.noneOf(TargetConstraint.class)
 	    );
-	
 	/**
 	 * Silence
 	 * reveal hand
@@ -276,7 +283,7 @@ public enum AbilityType {
         return forbiddenConstraints;
     }
 
-    public EnumSet<TriggerType> getAllowedTriggers(CardType cardType) {
+    public EnumSet<TriggerType> getAllowedTriggers() {
         return switch (this) {
             case DEBUFF_ENEMY, DEBUFF_ALLY,BUFF -> EnumSet.of(
                 TriggerType.ON_ATTACK,
@@ -292,11 +299,12 @@ public enum AbilityType {
         };
     }
     
-    public EnumSet<TriggerType> getForbiddenTriggers(CardType cardType) {
+    public EnumSet<TriggerType> getForbiddenTriggers() {
     	return switch (this) {
-    	case TAP_ENEMY,UNTAP_ENEMY,DESTROY_STRUCTURE_ENEMY,DESTROY_UNIT_ENEMY,DAMAGE_UNIT_ENEMY,DEBUFF_ENEMY,MOVE_ENEMY -> EnumSet.of(
+    	case TAP_ENEMY,UNTAP_ENEMY,DESTROY_STRUCTURE_ENEMY,DESTROY_UNIT_ENEMY,DAMAGE_UNIT_ENEMY,DEBUFF_ENEMY,MOVE_ENEMY,RETURN_TO_HAND -> EnumSet.of(
     			TriggerType.NO_ENEMY_UNITS
     			);
+    	
     	default -> EnumSet.noneOf(TriggerType.class);
     	};
     }
@@ -400,6 +408,8 @@ public enum AbilityType {
            	"Incline " + x + "unité"+(value > 1 ? "s" : "")+" ennemie"+(value > 1 ? "s" : ""); 
             case UNTAP_ENEMY ->
             "Redresse " + x + "unité"+(value > 1 ? "s" : "")+" ennemie"+(value > 1 ? "s" : "");  
+            case RETURN_TO_HAND ->
+            "La carte ciblée retourne en main";
         };
     }
 
@@ -418,7 +428,7 @@ public enum AbilityType {
     	case UNTAP_ALLY :				return 2;
     	case TAP_ENEMY :				return 2;
     	case UNTAP_ENEMY :				return 2;
-    	
+    	case RETURN_TO_HAND	:			return 1;
 		default:return 100;
 			
     	

@@ -33,7 +33,7 @@ public class CardInsertTest {
                 .withAttack(2)
                 .withDefense(4)
                 .withPowerScore(42)
-                .withEffects(List.of(CardEffect.generateRandomEffect(CardType.UNIT, 3, ThreadLocalRandom.current(), FactionProfileRegistry.get(Faction.ASTRAL), new HashSet<>())))
+                .withEffects(List.of(CardEffect.generateRandomEffect(CardType.UNIT, 3, ThreadLocalRandom.current(), FactionProfileRegistry.get(Faction.ASTRAL), new HashSet<>(),Set.of(Keyword.BOUCLIER))))
                 .withGeneratename()
                 .build();
         

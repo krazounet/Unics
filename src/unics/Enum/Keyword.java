@@ -30,7 +30,8 @@ public enum Keyword {
 	IMMUNITE_CONTRE_NOMAD("",5),
 	IMMUNITE_CONTRE_MECHANICAL("",5),
 	IMMUNITE_CONTRE_OCCULT("",5),
-	SANGUINAIRE("Ne peut pas attaquer le PC adverse",-0); //A rajouter : ne peut attaquer que les structure et unité
+	SANGUINAIRE("Ne peut pas attaquer le PC adverse",-10), //A rajouter : ne peut attaquer que les structure et unité
+	INCIBLABLE("Ne peut pas être ciblé",0); //A rajouter : ne peut attaquer que les structure et unité
 	/**
 	 * Unstable, si ciblé par un effet => détruite (dégats, buff/debuf, soin, )
 	 * Static, inciblable
@@ -149,7 +150,8 @@ public enum Keyword {
                 return atk * 3;
             case SANGUINAIRE:
                 return -(atk * 3);    
-           
+            case INCIBLABLE:
+                return (energy * 4);
             default:
                 return this.generatorWeight;
         }
@@ -165,4 +167,9 @@ public enum Keyword {
         default: return name();
     	}
     }
+
+	public boolean isForbiddenAbility(AbilityType a) {
+		//if (this == DEFENSIF)&&(a == )
+		return false;
+	}
 }

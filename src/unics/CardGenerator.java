@@ -101,7 +101,7 @@ public abstract class CardGenerator {
             case ACTION -> {
                 // Toute la valeur passe dans les effets
                 while (remainingBudget > SEUIL_BUDGET_RESTANT && effects.size() < NB_MAX_EFFECT_ACTION) {
-                    CardEffect e = CardEffect.generateRandomEffect(type, energyCost, random,profile,usedAbilities);
+                    CardEffect e = CardEffect.generateRandomEffect(type, energyCost, random,profile,usedAbilities,keywords);
                     //double power = Math.abs(e.computeRelativePower(energyCost));
                     double power = Math.abs(e.computeRawPower());
                     if (power <= remainingBudget) {
@@ -123,7 +123,7 @@ public abstract class CardGenerator {
             			roll_effect < (PCT_0_EFFECT+PCT_1_EFFECT) ? 1 : 2;
             			
                 for (int i=0;i<effecCount;i++) {
-                    CardEffect e = CardEffect.generateRandomEffect(type, energyCost, random,profile,usedAbilities);
+                    CardEffect e = CardEffect.generateRandomEffect(type, energyCost, random,profile,usedAbilities,keywords);
                     //double power = Math.abs(e.computeRelativePower(energyCost));
                     double power = Math.abs(e.computeRawPower());
                     if (power <= remainingBudget) {

@@ -27,7 +27,7 @@ public class TestStatistics {
 		int max=0;
 	for(int cout=1;cout<7;cout++) {
 		for(int i=0;i<1000;i++) {
-			int rp=(int)CardEffect.generateRandomEffect(CardType.UNIT,cout,ThreadLocalRandom.current(),FactionProfileRegistry.neutral(),new HashSet<>()).computeRawPower();
+			int rp=(int)CardEffect.generateRandomEffect(CardType.UNIT,cout,ThreadLocalRandom.current(),FactionProfileRegistry.neutral(),new HashSet<>(), new HashSet<>()).computeRawPower();
 			if (rp<min)min=rp;
 			if (rp>max)max=rp;
 			

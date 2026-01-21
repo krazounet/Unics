@@ -12,7 +12,7 @@ public class BalancedBoosterGenerator {
 
 	static ThreadLocalRandom random = ThreadLocalRandom.current();
 	
-	static boolean MAKE_IA_IMAGE=false;
+	static boolean MAKE_IA_IMAGE=true;
 			
 	static int nb_booster=5;
 	
@@ -31,7 +31,8 @@ public class BalancedBoosterGenerator {
 	
     public static void generateAndExportBooster(String pdfFileName) throws Exception {
  
-    	Booster booster=new Booster18(random);
+    	//Booster booster=new Booster18(random);
+    	Booster booster=new Booster18DB(random);
     	List<String> prompts=getPromptduBooster(booster);
     	List<Path> lp;
     	

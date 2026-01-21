@@ -178,8 +178,8 @@ public class JdbcCardDao {
             .withEnergyCost(row.energyCost)
             .withAttack(row.attack)
             .withDefense(row.defense)
-            .withKeywords(keywords)   // ✅ cette fois
-            .withEffects(effects)   // encore vide
+            .withKeywords(keywords)   
+            .withEffects(effects)   
             .withPowerScore(row.powerScore)
             .build();
     }
@@ -331,6 +331,64 @@ public class JdbcCardDao {
     	            effects.get(eid).constraints.add(cst);
     	        }
     	    }
+    	}
+    public static CardDbRow pickRandom(
+    	    
+    	    CardType type,
+    	    int mana,
+    	    Faction faction
+    	) throws SQLException {
+
+    	    String sql = """
+    	        SELECT
+    	        id,
+                identity_hash,
+                public_id,
+                name,
+                card_type,
+                faction,
+                energy_cost,
+                attack,
+                defense,
+                power_score
+    	        FROM card
+    	        WHERE card_type = ?
+    	          AND energy_cost = ?
+    	          AND faction = ?
+    	        ORDER BY RANDOM()
+    	        LIMIT 1
+    	    """;
+    	    
+    	    try (
+    	    		Connection c = DbUtil.getConnection();
+    	    		PreparedStatement ps = c.prepareStatement(sql)) {
+
+    	        ps.setString(1, type.name());
+    	        ps.setInt(2, mana);
+    	        ps.setString(3, faction.name());
+
+    	        try (ResultSet rs = ps.executeQuery()) {
+
+    	        	if (!rs.next()) {
+    	                return null;
+    	            }
+
+    	            return new CardDbRow(
+    	            	UUID.fromString(rs.getString("id")),
+    	                rs.getString("identity_hash"),
+    	                rs.getString("public_id"),
+    	                rs.getString("name"),
+    	                CardType.valueOf(rs.getString("card_type")),
+    	                Faction.valueOf(rs.getString("faction")),
+    	                rs.getInt("energy_cost"),
+    	                (Integer) rs.getObject("attack"),
+    	                (Integer) rs.getObject("defense"),
+    	                rs.getInt("power_score")
+    	            );
+    	        }
+    	    }
+
+    	   
     	}
     private static class CardEffectBuilderData {
 

@@ -192,6 +192,10 @@ public class CardPromptGenerator {
                 
             case SANGUINAIRE ->
             	"blood-infused energy, crimson glow around the character, empowered by recent violence, aggressive and relentless aura";
+            case INCIBLABLE ->
+        		"";
+        	
+            	
 		default -> throw new IllegalArgumentException("Unexpected value: " + keyword);
         };
     }
@@ -285,7 +289,8 @@ public class CardPromptGenerator {
 
     case UNTAP_ENEMY ->
         "enemy unit freed from restraints, systems reactivating or stance recovering";
-
+    case RETURN_TO_HAND->
+    "enemy unit being extracted from the battlefield by a teleportation beam";
             
 		default -> throw new IllegalArgumentException("Unexpected value: " + ability);
         };

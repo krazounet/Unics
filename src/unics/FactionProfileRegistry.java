@@ -53,7 +53,7 @@ public final class FactionProfileRegistry {
             new FactionProfile(
                 Faction.MECHANICAL,
                 //+15,
-                -10,
+                -5,
                 -5,
                 Set.of(
                     Keyword.BOUCLIER,
@@ -111,7 +111,7 @@ public final class FactionProfileRegistry {
             new FactionProfile(
                 Faction.NOMAD,
                // 0,
-                -10,
+                -5,
                 +20,
                 Set.of(
                     Keyword.MOBILE,

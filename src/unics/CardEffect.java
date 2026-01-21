@@ -84,7 +84,8 @@ public class CardEffect {
             int energyCost,
             ThreadLocalRandom random,
             FactionProfile profile,
-            Set<AbilityType> excludedAbilities
+            Set<AbilityType> excludedAbilities,
+            Set<Keyword> keywords
     ) {
     	
     	
@@ -112,6 +113,7 @@ public class CardEffect {
                 .filter(a -> !(cardType == CardType.STRUCTURE && a.isNegativeForOwner()))//les structures ont que des effets positifs
                 .filter(a -> !profile.getForbiddenAbilities().contains(a))
                 .filter(a -> !excludedAbilities.contains(a))
+                .filter(a -> isAbilityAllowedForKeywords(a,keywords))
                 .toList();
 
         List<AbilityType> weighted_abilities = new ArrayList<>();
@@ -131,9 +133,10 @@ public class CardEffect {
         // 3️⃣ Trigger compatible
         List<TriggerType> triggers = Arrays.stream(TriggerType.values())
         	    .filter(t -> t.isAllowedFor(cardType))
-        	    .filter(t -> ability.getAllowedTriggers(cardType).contains(t))
-        	    .filter(t -> !ability.getForbiddenTriggers(cardType).contains(t))
+        	    .filter(t -> ability.getAllowedTriggers().contains(t))
+        	    .filter(t -> !ability.getForbiddenTriggers().contains(t))
         	    .filter(t -> !profile.getForbiddenTrigger().contains(t))
+        	    //ici test trigger <> keyword
         	    .toList();
         if (triggers.isEmpty()) {
             throw new IllegalStateException(
@@ -234,7 +237,14 @@ public class CardEffect {
         );
     }
 
-    private static boolean isAbilityAllowedForCardType(
+    private static boolean isAbilityAllowedForKeywords(AbilityType a, Set<Keyword> keywords) {
+		for (Keyword kw : keywords) {
+			if (kw.isForbiddenAbility(a)) {return false;}
+		}
+		return true;
+	}
+
+	private static boolean isAbilityAllowedForCardType(
             AbilityType ability,
             CardType cardType
     ) {
