@@ -40,6 +40,7 @@ public abstract class CardGenerator {
 	private static final int MAX_EFFECT_ATTEMPTS = 10;
 
     static int NB_ESSAI_CARTE=50;
+    static int NB_ESSAI_CARTE_GLOBAL =200;
     
     private CardGenerator(
   
@@ -55,7 +56,22 @@ public abstract class CardGenerator {
                 return candidate;
             }
         }
-        throw new IllegalStateException("Impossible de générer une carte valide "+type+ "/"+cost);
+     // 2️⃣ Fallback GLOBAL (non récursif)
+        for (int i = 0; i < NB_ESSAI_CARTE_GLOBAL; i++) {
+            CardType t = CardType.randomCardType();
+            Faction f = Faction.randomFaction();
+            int c = random.nextInt(6) + 1;
+
+            Card candidate = generateCard(t, c, random, f);
+            if (isValid(candidate)) {
+                return candidate;
+            }
+        }
+
+        // 3️⃣ Échec explicite (normal en fin de saturation)
+        throw new IllegalStateException(
+            "Global card space exhausted"
+        );
     }
     
     

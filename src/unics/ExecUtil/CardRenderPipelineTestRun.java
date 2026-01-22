@@ -18,7 +18,7 @@ public final class CardRenderPipelineTestRun {
             JdbcCardDao cardDao = new JdbcCardDao();
 
             CardDbRow row =
-                cardDao.findRowByPublicId("6M6TNA");
+                cardDao.findRowByPublicId("5X8C6W");
 
             if (row == null) {
                 System.err.println("❌ Carte non trouvée");

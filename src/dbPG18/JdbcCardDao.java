@@ -1,11 +1,11 @@
 package dbPG18;
 
-import java.nio.charset.StandardCharsets;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,6 +27,51 @@ import unics.Enum.TriggerType;
 
 public class JdbcCardDao {
 
+	private static final int BATCH_SIZE = 1000;
+
+    private Connection connection;
+    private PreparedStatement psCard;
+   // private PreparedStatement psEffect;
+    private final List<Card> pendingCards = new ArrayList<>();
+    
+
+    private int batchCount = 0;
+
+    public JdbcCardDao() {
+        try {
+            this.connection = DbUtil.getConnection();
+            this.connection.setAutoCommit(false);
+
+            this.psCard = connection.prepareStatement("""
+            	    INSERT INTO card (
+            	        id,
+            	        public_id,
+            	        identity_hash,
+            	        identity_version,
+            	        name,
+            	        card_type,
+            	        faction,
+            	        energy_cost,
+            	        attack,
+            	        defense,
+            	        power_score
+            	    )
+            	    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            	""");
+
+            /*
+            this.psEffect = connection.prepareStatement("""
+                INSERT INTO card_effect (card_id, effect_type, value)
+                VALUES (?, ?, ?)
+            """);
+			*/
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+	
+	
+	
 	public int countCards() {
 	    final String sql = "SELECT COUNT(*) FROM card";
 
@@ -69,140 +114,7 @@ public class JdbcCardDao {
             throw new RuntimeException(e);
         }
     }
-    /*
-    public void insertCard(Card card) {
-
-        String sql = """
-            INSERT INTO card (
-                id,
-                public_id,
-                identity_hash,
-                identity_version,
-                name,
-                card_type,
-                faction,
-                energy_cost,
-                attack,
-                defense,
-                power_score
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT (identity_hash, identity_version)
-            DO NOTHING
-        """;
-
-        try (Connection c = DbUtil.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-
-            ps.setObject(1, card.getId());
-            ps.setString(2, card.getPublicId());
-            ps.setString(3, card.getIdentity().toString());
-            ps.setInt(4, CardIdentity.GENERATION_VERSION);
-
-            ps.setString(5, card.getName());
-            ps.setString(6, card.getCardType().name());
-            ps.setString(7, card.getFaction().name());
-            ps.setInt(8, card.getEnergyCost());
-
-            ps.setObject(9, card.getAttack());
-            ps.setObject(10, card.getDefense());
-
-            ps.setInt(11, card.getPowerScore());
-
-            ps.executeUpdate();
-            
-            insertKeywords(card, c);
-            insertEffects(card, c);
-        } catch (SQLException e) {
-            throw new RuntimeException("insertCard failed", e);
-        }
-    }*/
-    /*
-    public void insertCard(Card card) {
-
-        // 🔴 GARDE-FOU CRITIQUE (temporaire mais très utile)
-        if (card.getCardType() == CardType.ACTION && card.getEffects().isEmpty()) {
-            System.err.println(
-                "[ERROR] Attempting to persist ACTION without effects: "
-                + card.getPublicId()
-            );
-            throw new IllegalStateException("Invalid ACTION without effects");
-        }
-
-        System.out.println(
-            "[DB] INSERT CARD "
-            + card.getPublicId()
-            + " id=" + card.getId()
-            + " type=" + card.getCardType()
-            + " cost=" + card.getEnergyCost()
-            + " effects(before insert)=" + card.getEffects().size()
-        );
-
-        String sql = """
-            INSERT INTO card (
-                id,
-                public_id,
-                identity_hash,
-                identity_version,
-                name,
-                card_type,
-                faction,
-                energy_cost,
-                attack,
-                defense,
-                power_score
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT (identity_hash, identity_version)
-            DO NOTHING
-        """;
-
-        try (Connection c = DbUtil.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-
-            ps.setObject(1, card.getId());
-            ps.setString(2, card.getPublicId());
-            ps.setString(3, card.getIdentity().toString());
-            ps.setInt(4, CardIdentity.GENERATION_VERSION);
-
-            ps.setString(5, card.getName());
-            ps.setString(6, card.getCardType().name());
-            ps.setString(7, card.getFaction().name());
-            ps.setInt(8, card.getEnergyCost());
-
-            ps.setObject(9, card.getAttack());
-            ps.setObject(10, card.getDefense());
-
-            ps.setInt(11, card.getPowerScore());
-
-            int rows = ps.executeUpdate();
-
-            System.out.println(
-                "[DB] card insert rows=" + rows
-                + " (0 means duplicate)"
-            );
-
-            // 🔑 INSERT KEYWORDS
-            insertKeywords(card, c);
-
-            // 🔑 INSERT EFFECTS (LOG AVANT)
-            System.out.println(
-                "[DB] inserting effects for card "
-                + card.getId()
-                + " count=" + card.getEffects().size()
-            );
-
-            insertEffects(card, c);
-
-            System.out.println(
-                "[DB] DONE card "
-                + card.getPublicId()
-            );
-
-        } catch (SQLException e) {
-            throw new RuntimeException("insertCard failed for " + card.getPublicId(), e);
-        }
-    }*/
+    
     public void insertCard(Card card) {
 
         String sql = """
@@ -256,6 +168,34 @@ public class JdbcCardDao {
             throw new RuntimeException("insertCard failed", e);
         }
     }
+    public void insertCardBatch(Card card) {
+        try {
+            psCard.setObject(1, card.getId());
+            psCard.setString(2, card.getPublicId());
+            psCard.setString(3, card.getIdentity().toString());
+            psCard.setInt(4, CardIdentity.GENERATION_VERSION);
+            psCard.setString(5, card.getName());
+            psCard.setString(6, card.getCardType().name());
+            psCard.setString(7, card.getFaction().name());
+            psCard.setInt(8, card.getEnergyCost());
+            psCard.setObject(9, card.getAttack());
+            psCard.setObject(10, card.getDefense());
+            psCard.setInt(11, card.getPowerScore());
+
+            psCard.addBatch();
+
+            // ⚠️ on stocke les cartes à finaliser
+            pendingCards.add(card);
+
+            if (++batchCount % BATCH_SIZE == 0) {
+                flush();
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
 
     public CardDbRow findRowByPublicId(String publicId) {
@@ -417,12 +357,7 @@ public class JdbcCardDao {
             cps.executeBatch();
         }
     }
-    /*
-    private UUID effectId(CardEffect effect) {
-        return UUID.nameUUIDFromBytes(
-            effect.toIdentityString().getBytes(StandardCharsets.UTF_8)
-        );
-    }*/
+ 
     private List<CardEffect> loadEffects(UUID cardId, Connection c) throws SQLException {
 
         String sql = """
@@ -586,5 +521,52 @@ public class JdbcCardDao {
         }
     }
 
-    
+    private void flush() {
+        try {
+            if (pendingCards.isEmpty()) return;
+
+            int[] results = psCard.executeBatch();
+            connection.commit();
+
+            for (int i = 0; i < results.length; i++) {
+                int rows = results[i];
+                Card c = pendingCards.get(i);
+
+                if (rows > 0) { // ✅ carte réellement insérée
+                    insertKeywords(c, connection);
+                    insertEffects(c, connection);
+                }
+            }
+
+            pendingCards.clear();
+            batchCount = 0;
+
+        } catch (SQLException e) {
+            rollbackQuietly();
+            throw new RuntimeException("Erreur lors du flush batch", e);
+        }
+    }
+
+
+
+
+    private void rollbackQuietly() {
+        try {
+            if (connection != null) {
+                connection.rollback();
+            }
+        } catch (SQLException ignored) {
+            // volontairement ignoré
+        }
+    }
+    public void close() {
+        try {
+            flush(); // 🔥 flush final obligatoire
+        } finally {
+            try { psCard.close(); } catch (Exception ignored) {}
+           // try { psEffect.close(); } catch (Exception ignored) {}
+            try { connection.close(); } catch (Exception ignored) {}
+        }
+    }
+
 }

@@ -11,7 +11,7 @@ import unics.Enum.Faction;
 public class ExecGenerateMassCardForDB {
 
     static final int NB_ESSAI_CARTE = 50;
-    static final int TOTAL = 100000;
+    static final int TOTAL = 10000;
 
     public static void main(String[] args) {
     	long start = System.currentTimeMillis();
@@ -35,6 +35,8 @@ public class ExecGenerateMassCardForDB {
                 
             }
         }
+        cardDao.close();
+
         long end = System.currentTimeMillis();
         double tempsEnSecondes = (end - start) / 1000.0;
         System.out.println("Temps : " + tempsEnSecondes + " s");
