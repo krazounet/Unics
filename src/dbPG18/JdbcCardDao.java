@@ -27,12 +27,12 @@ import unics.Enum.TriggerType;
 
 public class JdbcCardDao {
 
-	private static final int BATCH_SIZE = 1000;
+	private static final int BATCH_SIZE = 2000;
 
-    private Connection connection;
-    private PreparedStatement psCard;
-   // private PreparedStatement psEffect;
-    private final List<Card> pendingCards = new ArrayList<>();
+	private final Connection connection;
+	private final PreparedStatement psCard;
+	private final List<Card> pendingCards = new ArrayList<>(BATCH_SIZE);
+
     
 
     private int batchCount = 0;
@@ -43,32 +43,27 @@ public class JdbcCardDao {
             this.connection.setAutoCommit(false);
 
             this.psCard = connection.prepareStatement("""
-            	    INSERT INTO card (
-            	        id,
-            	        public_id,
-            	        identity_hash,
-            	        identity_version,
-            	        name,
-            	        card_type,
-            	        faction,
-            	        energy_cost,
-            	        attack,
-            	        defense,
-            	        power_score
-            	    )
-            	    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            	""");
-
-            /*
-            this.psEffect = connection.prepareStatement("""
-                INSERT INTO card_effect (card_id, effect_type, value)
-                VALUES (?, ?, ?)
+                INSERT INTO card (
+                    id,
+                    public_id,
+                    identity_hash,
+                    identity_version,
+                    name,
+                    card_type,
+                    faction,
+                    energy_cost,
+                    attack,
+                    defense,
+                    power_score
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """);
-			*/
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
+
 	
 	
 	
@@ -183,11 +178,9 @@ public class JdbcCardDao {
             psCard.setInt(11, card.getPowerScore());
 
             psCard.addBatch();
-
-            // ⚠️ on stocke les cartes à finaliser
             pendingCards.add(card);
 
-            if (++batchCount % BATCH_SIZE == 0) {
+            if (pendingCards.size() >= BATCH_SIZE) {
                 flush();
             }
 
@@ -195,6 +188,7 @@ public class JdbcCardDao {
             throw new RuntimeException(e);
         }
     }
+
 
 
 
@@ -525,18 +519,15 @@ public class JdbcCardDao {
         try {
             if (pendingCards.isEmpty()) return;
 
-            int[] results = psCard.executeBatch();
-            connection.commit();
+            psCard.executeBatch();
+            connection.commit(); // commit cartes
 
-            for (int i = 0; i < results.length; i++) {
-                int rows = results[i];
-                Card c = pendingCards.get(i);
-
-                if (rows > 0) { // ✅ carte réellement insérée
-                    insertKeywords(c, connection);
-                    insertEffects(c, connection);
-                }
+            for (Card c : pendingCards) {
+                insertKeywords(c, connection);
+                insertEffects(c, connection);
             }
+
+            connection.commit(); // 🔥 COMMIT DES EFFETS (OBLIGATOIRE)
 
             pendingCards.clear();
             batchCount = 0;
@@ -546,6 +537,8 @@ public class JdbcCardDao {
             throw new RuntimeException("Erreur lors du flush batch", e);
         }
     }
+
+
 
 
 

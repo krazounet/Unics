@@ -1,10 +1,12 @@
-package unics;
+package unics.ExecUtil;
 
 
 
 import java.util.concurrent.ThreadLocalRandom;
 
 import dbPG18.JdbcCardDao;
+import unics.Card;
+import unics.CardGenerator;
 import unics.Enum.CardType;
 import unics.Enum.Faction;
 
