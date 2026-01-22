@@ -13,7 +13,7 @@ import unics.Enum.Keyword;
 
 public abstract class CardGenerator {
 
-	private static int BUDGET_BASE=20;//parti à 36
+	private static int BUDGET_BASE=25;//parti à 36
 	private static int BUDGET_PER_ENERGY=24;
 	
 	private static int PCT_0_KEYWORD=15;
@@ -21,7 +21,7 @@ public abstract class CardGenerator {
 	private static int PCT_2_KEYWORD=10;
 	//private static int PCT_3_KEYWORD=5;
 	
-	private static int PCT_0_EFFECT=10;
+	private static int PCT_0_EFFECT=8;
 	private static int PCT_1_EFFECT=80;
 	//private static int PCT_2_EFFECT=10;
 	
@@ -37,32 +37,47 @@ public abstract class CardGenerator {
 	private static int SEUIL_CARTE_VALIDE_BAS = 90; //en pourcentage
 	private static int SEUIL_CARTE_VALIDE_HAUT = 110; //en pourcentage
 
-    public CardGenerator(
+	private static final int MAX_EFFECT_ATTEMPTS = 10;
+
+    static int NB_ESSAI_CARTE=50;
+    
+    private CardGenerator(
   
     ) {
   
     	
     }
+    public static Card generateValidatedCard(CardType type, int cost,Faction faction,ThreadLocalRandom random) {
+        //Card bestCard = null;
+        for (int i = 0; i < NB_ESSAI_CARTE; i++) {
+            Card candidate = CardGenerator.generateCard(type,cost,random,faction);//ici agir sur le cout
+            if (CardGenerator.isValid(candidate)) {
+                return candidate;
+            }
+        }
+        throw new IllegalStateException("Impossible de générer une carte valide "+type+ "/"+cost);
+    }
     
-    public static Card generateCard(ThreadLocalRandom random) {
-    	CardType type = randomCardType();
-    	Faction faction = randomFaction();
+    
+    public static Card generateValidatedCard(ThreadLocalRandom random) {
+    	CardType type = CardType.randomCardType();
+    	Faction faction = Faction.randomFaction();
     	int energyCost = random.nextInt(6)+1;
-    	return generateCard(type,energyCost,random,faction);
+    	return generateValidatedCard(type,energyCost,faction,random);
     }
     
-    public static Card generateCard(CardType type, ThreadLocalRandom random) {
-    	Faction faction = randomFaction();
+    public static Card generateValidatedCard(CardType type, ThreadLocalRandom random) {
+    	Faction faction = Faction.randomFaction();
     	int energyCost = random.nextInt(6)+1;
-    	return generateCard(type,energyCost,random,faction);
+    	return generateValidatedCard(type,energyCost,faction,random);
     }
     
-    public static Card generateCard(CardType type, int energyCost, ThreadLocalRandom random) {
-    	Faction faction = randomFaction();
-    	return generateCard(type,energyCost,random,faction);
+    public static Card generateValidatedCard(CardType type, int energyCost, ThreadLocalRandom random) {
+    	Faction faction = Faction.randomFaction();
+    	return generateValidatedCard(type,energyCost,faction,random);
     }
     
-    public static Card generateCard(CardType type, int energyCost, ThreadLocalRandom random, Faction faction) {
+    private static Card generateCard(CardType type, int energyCost, ThreadLocalRandom random, Faction faction) {
 
         int initialBudget = BUDGET_BASE + BUDGET_PER_ENERGY * energyCost;
         int remainingBudget = initialBudget;
@@ -122,16 +137,30 @@ public abstract class CardGenerator {
             			roll_effect < PCT_0_EFFECT ? 0 :
             			roll_effect < (PCT_0_EFFECT+PCT_1_EFFECT) ? 1 : 2;
             			
-                for (int i=0;i<effecCount;i++) {
-                    CardEffect e = CardEffect.generateRandomEffect(type, energyCost, random,profile,usedAbilities,keywords);
-                    //double power = Math.abs(e.computeRelativePower(energyCost));
-                    double power = Math.abs(e.computeRawPower());
-                    if (power <= remainingBudget) {
-                        effects.add(e);
-                        usedAbilities.add(e.getAbility());
-                        remainingBudget -= power;
-                    }
-                }
+            	for (int i = 0; i < effecCount; i++) {
+
+            	    CardEffect chosen = null;
+
+            	    for (int attempt = 0; attempt < MAX_EFFECT_ATTEMPTS; attempt++) {
+            	        CardEffect e = CardEffect.generateRandomEffect(
+            	            type, energyCost, random, profile, usedAbilities,keywords
+            	        );
+
+            	        double power = Math.abs(e.computeRawPower());
+
+            	        if (power <= remainingBudget) {
+            	            chosen = e;
+            	            break;
+            	        }
+            	    }
+
+            	    if (chosen != null) {
+            	        effects.add(chosen);
+            	        usedAbilities.add(chosen.getAbility());
+            	        remainingBudget -= Math.abs(chosen.computeRawPower());
+            	    }
+            	}
+
             }
    
             default -> throw new IllegalStateException("Type non géré : " + type);
@@ -210,17 +239,11 @@ public abstract class CardGenerator {
 
 
 
-	private static Faction randomFaction() {
-        Faction[] values = Faction.values();
-        return values[ThreadLocalRandom.current().nextInt(values.length)];
-    }
-	private static CardType randomCardType() {
-		CardType[] values = CardType.values();
-        return values[ThreadLocalRandom.current().nextInt(values.length)];
-    }
+
 	
 	
-	public static boolean isValid(Card card) {
+	
+	private static boolean isValid(Card card) {
 
         // PowerScore
         if (card.getPowerScore() < SEUIL_CARTE_VALIDE_BAS || card.getPowerScore() > SEUIL_CARTE_VALIDE_HAUT) {
@@ -250,6 +273,6 @@ public abstract class CardGenerator {
 
         return true;
     }
-	
+   
 }
 

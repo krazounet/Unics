@@ -1,6 +1,7 @@
 package unics.Enum;
 
 import java.util.EnumSet;
+import java.util.Set;
 
 public enum TriggerType {
 
@@ -188,4 +189,17 @@ public enum TriggerType {
     public String toString() {
         return displayName + " (" + name() + ", poids=" + weight + ")";
     }
+    /**
+     * Liste les associations interdites entre Keyword et Trigger
+     * esemple : BOUCLIER et  “quand vous perdez des PC”
+     * @param keywords
+     * @return
+     */
+	public boolean isAllowedFor(Set<Keyword> keywords) {
+		return switch (this) {
+		case PC_DAMAGED -> !keywords.contains(Keyword.BOUCLIER);
+		default -> true;
+		};
+		//return true;
+	}
 }

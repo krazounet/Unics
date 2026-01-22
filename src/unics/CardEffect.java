@@ -137,6 +137,7 @@ public class CardEffect {
         	    .filter(t -> !ability.getForbiddenTriggers().contains(t))
         	    .filter(t -> !profile.getForbiddenTrigger().contains(t))
         	    //ici test trigger <> keyword
+        	    .filter(t -> t.isAllowedFor(keywords))
         	    .toList();
         if (triggers.isEmpty()) {
             throw new IllegalStateException(

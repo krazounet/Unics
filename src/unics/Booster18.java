@@ -21,15 +21,15 @@ public class Booster18 extends Booster {
 		        FactionDistribution.generate(List.of(12, 6));
 		cards= new ArrayList<>();
 		for (int i=0; i<NB_UNIT_MIN;i++) {
-			cards.add(generateValidatedCard(CardType.UNIT,manacurve.get(index_booster),factions.get(index_booster)));
+			cards.add(CardGenerator.generateValidatedCard(CardType.UNIT,manacurve.get(index_booster),factions.get(index_booster),random));
 			index_booster++;
 		}
 		for (int i=0; i<NB_STRUCTURE_MIN;i++) {
-			cards.add(generateValidatedCard(CardType.STRUCTURE,manacurve.get(index_booster),factions.get(index_booster)));
+			cards.add(CardGenerator.generateValidatedCard(CardType.STRUCTURE,manacurve.get(index_booster),factions.get(index_booster),random));
 			index_booster++;
 		}
 		for (int i=0; i<NB_ACTION_MIN;i++) {
-			cards.add(generateValidatedCard(CardType.ACTION,manacurve.get(index_booster),factions.get(index_booster)));
+			cards.add(CardGenerator.generateValidatedCard(CardType.ACTION,manacurve.get(index_booster),factions.get(index_booster),random));
 			index_booster++;
 		}
 
@@ -37,7 +37,7 @@ public class Booster18 extends Booster {
     	    CardType type = random.nextInt(100) < 33 ? CardType.UNIT
     	                    : random.nextInt(100) < 66 ? CardType.ACTION
     	                    : CardType.STRUCTURE;
-    	    cards.add(generateValidatedCard(type,manacurve.get(index_booster),factions.get(index_booster)));
+    	    cards.add(CardGenerator.generateValidatedCard(type,manacurve.get(index_booster),factions.get(index_booster),random));
     	    index_booster++;
 
 		

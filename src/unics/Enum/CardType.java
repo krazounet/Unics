@@ -1,7 +1,8 @@
 package unics.Enum;
 
+import java.util.concurrent.ThreadLocalRandom;
 
-	public enum CardType {
+public enum CardType {
 		
 	    UNIT(1),        // unité classique
 	    STRUCTURE(2),   // impact plus durable ou passif
@@ -17,6 +18,9 @@ package unics.Enum;
 	    public int getTypeValue() {
 	        return typeValue;
 	    }
-	    
+	    public static CardType randomCardType() {
+			CardType[] values = CardType.values();
+	        return values[ThreadLocalRandom.current().nextInt(values.length)];
+	    }
 	    
 }

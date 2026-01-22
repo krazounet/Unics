@@ -276,6 +276,12 @@ public class BoosterPdfExporterStyled {
                 	        case "énergie":
                 	            p.add(createIcon("resources/images/icons/energy.png"));
                 	            break;
+                	        case "énergies":
+                	            p.add(createIcon("resources/images/icons/energy.png"));
+                	            break;
+                	        case "dégât":
+                	            p.add(createIcon("resources/images/icons/hit.png"));
+                	            break;
                 	        case "dégâts":
                 	            p.add(createIcon("resources/images/icons/hit.png"));
                 	            break;

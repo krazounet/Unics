@@ -27,6 +27,26 @@ import unics.Enum.TriggerType;
 
 public class JdbcCardDao {
 
+	public int countCards() {
+	    final String sql = "SELECT COUNT(*) FROM card";
+
+	    try (Connection conn = DbUtil.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql);
+	         ResultSet rs = ps.executeQuery()) {
+
+	        if (rs.next()) {
+	            return rs.getInt(1);
+	        }
+
+	        throw new SQLException("COUNT(*) did not return a result");
+
+	    } catch (SQLException e) {
+	        throw new RuntimeException("Failed to count cards", e);
+	    }
+	}
+
+	
+	
     public boolean existsByIdentity(CardIdentity identity) {
 
         String sql = """
@@ -49,7 +69,7 @@ public class JdbcCardDao {
             throw new RuntimeException(e);
         }
     }
-
+    /*
     public void insertCard(Card card) {
 
         String sql = """
@@ -96,8 +116,148 @@ public class JdbcCardDao {
         } catch (SQLException e) {
             throw new RuntimeException("insertCard failed", e);
         }
+    }*/
+    /*
+    public void insertCard(Card card) {
+
+        // 🔴 GARDE-FOU CRITIQUE (temporaire mais très utile)
+        if (card.getCardType() == CardType.ACTION && card.getEffects().isEmpty()) {
+            System.err.println(
+                "[ERROR] Attempting to persist ACTION without effects: "
+                + card.getPublicId()
+            );
+            throw new IllegalStateException("Invalid ACTION without effects");
+        }
+
+        System.out.println(
+            "[DB] INSERT CARD "
+            + card.getPublicId()
+            + " id=" + card.getId()
+            + " type=" + card.getCardType()
+            + " cost=" + card.getEnergyCost()
+            + " effects(before insert)=" + card.getEffects().size()
+        );
+
+        String sql = """
+            INSERT INTO card (
+                id,
+                public_id,
+                identity_hash,
+                identity_version,
+                name,
+                card_type,
+                faction,
+                energy_cost,
+                attack,
+                defense,
+                power_score
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (identity_hash, identity_version)
+            DO NOTHING
+        """;
+
+        try (Connection c = DbUtil.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setObject(1, card.getId());
+            ps.setString(2, card.getPublicId());
+            ps.setString(3, card.getIdentity().toString());
+            ps.setInt(4, CardIdentity.GENERATION_VERSION);
+
+            ps.setString(5, card.getName());
+            ps.setString(6, card.getCardType().name());
+            ps.setString(7, card.getFaction().name());
+            ps.setInt(8, card.getEnergyCost());
+
+            ps.setObject(9, card.getAttack());
+            ps.setObject(10, card.getDefense());
+
+            ps.setInt(11, card.getPowerScore());
+
+            int rows = ps.executeUpdate();
+
+            System.out.println(
+                "[DB] card insert rows=" + rows
+                + " (0 means duplicate)"
+            );
+
+            // 🔑 INSERT KEYWORDS
+            insertKeywords(card, c);
+
+            // 🔑 INSERT EFFECTS (LOG AVANT)
+            System.out.println(
+                "[DB] inserting effects for card "
+                + card.getId()
+                + " count=" + card.getEffects().size()
+            );
+
+            insertEffects(card, c);
+
+            System.out.println(
+                "[DB] DONE card "
+                + card.getPublicId()
+            );
+
+        } catch (SQLException e) {
+            throw new RuntimeException("insertCard failed for " + card.getPublicId(), e);
+        }
+    }*/
+    public void insertCard(Card card) {
+
+        String sql = """
+            INSERT INTO card (
+                id,
+                public_id,
+                identity_hash,
+                identity_version,
+                name,
+                card_type,
+                faction,
+                energy_cost,
+                attack,
+                defense,
+                power_score
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (identity_hash, identity_version)
+            DO NOTHING
+        """;
+
+        try (Connection c = DbUtil.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setObject(1, card.getId());
+            ps.setString(2, card.getPublicId());
+            ps.setString(3, card.getIdentity().toString());
+            ps.setInt(4, CardIdentity.GENERATION_VERSION);
+
+            ps.setString(5, card.getName());
+            ps.setString(6, card.getCardType().name());
+            ps.setString(7, card.getFaction().name());
+            ps.setInt(8, card.getEnergyCost());
+
+            ps.setObject(9, card.getAttack());
+            ps.setObject(10, card.getDefense());
+            ps.setInt(11, card.getPowerScore());
+
+            int rows = ps.executeUpdate();
+
+            // 🚨 SI doublon → on sort IMMEDIATEMENT
+            if (rows == 0) {
+                return;
+            }
+
+            // ✅ Carte réellement insérée → on insère le reste
+            insertKeywords(card, c);
+            insertEffects(card, c);
+
+        } catch (SQLException e) {
+            throw new RuntimeException("insertCard failed", e);
+        }
     }
-    
+
+
     public CardDbRow findRowByPublicId(String publicId) {
 
         String sql = """
@@ -234,8 +394,8 @@ public class JdbcCardDao {
         ) {
             for (CardEffect e : card.getEffects()) {
 
-                UUID eid = effectId(e);
-
+                //UUID eid = effectId(e);
+            	UUID eid = UUID.randomUUID(); // ← FIX CRITIQUE
                 eps.setObject(1, eid);
                 eps.setObject(2, card.getId());
                 eps.setString(3, e.getTrigger().name());
@@ -257,11 +417,12 @@ public class JdbcCardDao {
             cps.executeBatch();
         }
     }
+    /*
     private UUID effectId(CardEffect effect) {
         return UUID.nameUUIDFromBytes(
             effect.toIdentityString().getBytes(StandardCharsets.UTF_8)
         );
-    }
+    }*/
     private List<CardEffect> loadEffects(UUID cardId, Connection c) throws SQLException {
 
         String sql = """

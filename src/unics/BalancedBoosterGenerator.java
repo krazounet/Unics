@@ -12,7 +12,7 @@ public class BalancedBoosterGenerator {
 
 	static ThreadLocalRandom random = ThreadLocalRandom.current();
 	
-	static boolean MAKE_IA_IMAGE=true;
+	static boolean MAKE_IA_IMAGE=false;
 			
 	static int nb_booster=5;
 	

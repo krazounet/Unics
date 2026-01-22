@@ -3,6 +3,8 @@
  */
 package unics.Enum;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * 
  */
@@ -11,5 +13,11 @@ public enum Faction {
     ORGANIC,
     NOMAD,
     MECHANICAL,
-    OCCULT
+    OCCULT;
+    
+    
+	public static Faction randomFaction() {
+        Faction[] values = Faction.values();
+        return values[ThreadLocalRandom.current().nextInt(values.length)];
+    }
 }

@@ -52,8 +52,8 @@ public class Booster18DB extends Booster {
             CardDbRow row = JdbcCardDao.pickRandom(type, mana, faction);
 
             if (row == null) {
-                cards.add(generateValidatedCard(type, mana, faction));
-                return;
+                //cards.add(generateValidatedCard(type, mana, faction));
+            	 throw new IllegalStateException("Impossible de générer une carte valide "+type+ "/"+mana+"/"+faction);
             }
 
             Card card = dao.rebuildCard(row);
@@ -62,7 +62,7 @@ public class Booster18DB extends Booster {
         } catch (SQLException e) {
             // log + fallback
         	System.err.println("fallback Booster18DB");
-            cards.add(generateValidatedCard(type, mana, faction));
+            cards.add(CardGenerator.generateValidatedCard(type, mana, faction,random));
         }
     }
 

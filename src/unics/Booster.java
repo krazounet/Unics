@@ -19,7 +19,7 @@ public abstract class Booster {
 
     ThreadLocalRandom random;
     
-    static int NB_ESSAI_CARTE=50;
+
     protected ManaCurveProfile manaCurveProfile;
     protected List<Integer> manaCurve;
 
@@ -44,12 +44,13 @@ public abstract class Booster {
         
         for (int i = 0; i < count; i++) {
         	int cost=manacurve.get(index_cost);
-            cards.add(generateValidatedCard(type,cost));
+        	Faction f = Faction.randomFaction();
+            cards.add(CardGenerator.generateValidatedCard(type,cost,f,random));
             index_cost++;
         }
         return cards;
     }
-    
+    /*
     private Card generateValidatedCard(CardType type, int cost) {
         //Card bestCard = null;
         for (int i = 0; i < NB_ESSAI_CARTE; i++) {
@@ -60,16 +61,7 @@ public abstract class Booster {
         }
         throw new IllegalStateException("Impossible de générer une carte valide "+type+ "/"+cost);
     }
-    protected Card generateValidatedCard(CardType type, int cost,Faction faction) {
-        //Card bestCard = null;
-        for (int i = 0; i < NB_ESSAI_CARTE; i++) {
-            Card candidate = CardGenerator.generateCard(type,cost,random,faction);//ici agir sur le cout
-            if (CardGenerator.isValid(candidate)) {
-                return candidate;
-            }
-        }
-        throw new IllegalStateException("Impossible de générer une carte valide "+type+ "/"+cost);
-    }
+	*/
     
     
 	public List<Card> getCards() {
