@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
+import dbPG18.DbUtil;
 import dbPG18.JdbcCardDao;
 import unics.Card;
 import unics.CardBuilder;
@@ -41,14 +42,17 @@ public class CardInsertTest {
         // 2️⃣ Vérification visuelle
         System.out.println("Identity = " + card.getIdentity());
 
-        // 3️⃣ Insertion DB via DAO minimal
-        JdbcCardDao dao = new JdbcCardDao();
+        try (JdbcCardDao dao = new JdbcCardDao(DbUtil.getConnection())) {
 
-        if (dao.existsByIdentity(card.getIdentity())) {
-            System.out.println("Carte déjà existante en base");
-        } else {
-            dao.insertCard(card);
-            System.out.println("Carte insérée en base");
+            if (dao.existsByIdentity(card.getIdentity())) {
+                System.out.println("Carte déjà existante en base");
+            } else {
+                dao.insertCard(card);
+                System.out.println("Carte insérée en base");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

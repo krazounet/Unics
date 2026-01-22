@@ -4,6 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
+import dbPG18.DbUtil;
 import dbPG18.JdbcCardDao;
 import unics.Card;
 import unics.CardGenerator;
@@ -52,18 +53,20 @@ public class ExecMassBulkGeneration {
 		        "Impossible d'atteindre " + TARGET + " cartes uniques, obtenu: " + uniques.size()
 		    );
 		}
-		//insert
-		JdbcCardDao dao = new JdbcCardDao();
+		// 🔥 INSERTION DB — pattern CORRECT
+        try (JdbcCardDao dao = new JdbcCardDao(DbUtil.getConnection())) {
 
-		for (Card c : uniques.values()) {
-			if ((c.getCardType() == CardType.ACTION)&&(c.getEffects().size()==0)) {
-				throw new IllegalStateException(
-				        "carte action sans effet"
-				    );
-			}
-		    dao.insertCardBatch(c);
-		}
+            for (Card c : uniques.values()) {
 
-		dao.close();
+                if (c.getCardType() == CardType.ACTION && c.getEffects().isEmpty()) {
+                    throw new IllegalStateException("carte action sans effet");
+                }
+
+                dao.insertCardBatch(c);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 	}
 }

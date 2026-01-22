@@ -10,26 +10,33 @@ public final class CardRenderPipelineTestRun {
 
     public static void main(String[] args) {
 
+    	Card card = null;
+
         try {
             // ─────────────────────────────────────────────
-            // 1️⃣ Charger une carte depuis la DB
+            // 1️⃣ Charger la carte (DB courte et fermée)
             // ─────────────────────────────────────────────
 
-            JdbcCardDao cardDao = new JdbcCardDao();
+            JdbcCardDao cardDao =
+                new JdbcCardDao(DbUtil.getConnection());
 
-            CardDbRow row =
-                cardDao.findRowByPublicId("5X8C6W");
+            try {
+                CardDbRow row =
+                    cardDao.findRowByPublicId("5X8C6W");
 
-            if (row == null) {
-                System.err.println("❌ Carte non trouvée");
-                return;
+                if (row == null) {
+                    System.err.println("❌ Carte non trouvée");
+                    return;
+                }
+
+                card = cardDao.rebuildCard(row);
+
+                System.out.println("✅ Carte chargée : " + card.getName());
+
+            } finally {
+                // 🔒 fermeture EXPLICITE
+                cardDao.close();
             }
-
-            Card card =
-                cardDao.rebuildCard(row);
-
-            System.out.println("✅ Carte chargée : " + card.getName());
-
             // ─────────────────────────────────────────────
             // 2️⃣ Initialiser le pipeline
             // ─────────────────────────────────────────────

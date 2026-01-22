@@ -1,6 +1,5 @@
 package unics.ExecUtil;
 
-
 import java.nio.file.Path;
 
 import aiGenerated.CardRender;
@@ -9,46 +8,44 @@ import aiGenerated.ComfyUIClient;
 import aiGenerated.ComfyUIWorker;
 import aiGenerated.RenderStatus;
 import dbPG18.CardDbRow;
+import dbPG18.DbUtil;
 import dbPG18.JdbcCardDao;
 import unics.Card;
 import unics.snapshot.CardSnapshot;
-
-
 
 public final class ComfyUITestRun {
 
     public static void main(String[] args) {
 
+        Card card;
+
         try {
             // ─────────────────────────────────────────────
-            // 1️⃣ Récupérer UNE carte depuis la DB
+            // 1️⃣ Charger UNE carte depuis la DB (scope court)
             // ─────────────────────────────────────────────
-        	/*
-            CardRepository cardRepository = new CardRepository(); 
-            // ⚠️ adapte au vrai nom de ton repo
 
-            Optional<Card> maybeCard = cardRepository.findAny();
+            JdbcCardDao dao =
+                new JdbcCardDao(DbUtil.getConnection());
 
-            if (maybeCard.isEmpty()) {
-                System.err.println("❌ Aucune carte trouvée en base");
-                return;
+            try {
+                CardDbRow row =
+                    dao.findRowByPublicId("6M6TNA");
+
+                if (row == null) {
+                    System.out.println("Carte non trouvée");
+                    return;
+                }
+
+                card = dao.rebuildCard(row);
+                System.out.println("✅ Carte chargée : " + card.getName());
+
+            } finally {
+                // 🔒 fermeture EXPLICITE de la DB
+                dao.close();
             }
-            */
-            JdbcCardDao dao = new JdbcCardDao();
-
-            CardDbRow row = dao.findRowByPublicId("6M6TNA"); // adapte si besoin
-            if (row == null) {
-                System.out.println("Carte non trouvée");
-                return;
-            }
-            //Card rebuilt = dao.rebuildCard(row);
-            
-            
-            Card card = dao.rebuildCard(row);
-            System.out.println("✅ Carte chargée : " + card.getName());
 
             // ─────────────────────────────────────────────
-            // 2️⃣ Freeze → CardSnapshot
+            // 2️⃣ Freeze → CardSnapshot (hors DB)
             // ─────────────────────────────────────────────
 
             CardSnapshot snapshot = card.freeze();
@@ -78,10 +75,11 @@ public final class ComfyUITestRun {
                 );
 
             // ─────────────────────────────────────────────
-            // 5️⃣ Exécution du rendu
+            // 5️⃣ Exécution du rendu (0 DB ici)
             // ─────────────────────────────────────────────
 
-            CardRender result = worker.execute(render);
+            CardRender result =
+                worker.execute(render);
 
             if (result.status == RenderStatus.DONE) {
                 System.out.println("✅ Image générée !");

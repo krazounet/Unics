@@ -25,7 +25,7 @@ import unics.Enum.TargetConstraint;
 import unics.Enum.TargetType;
 import unics.Enum.TriggerType;
 
-public class JdbcCardDao {
+public class JdbcCardDao implements AutoCloseable  {
 
 	private static final int BATCH_SIZE = 2000;
 
@@ -35,34 +35,26 @@ public class JdbcCardDao {
 
     
 
-    private int batchCount = 0;
+    //private int batchCount = 0;
 
-    public JdbcCardDao() {
-        try {
-            this.connection = DbUtil.getConnection();
-            this.connection.setAutoCommit(false);
+	public JdbcCardDao(Connection connection) {
+	    try {
+	        this.connection = connection;
+	        this.connection.setAutoCommit(false);
 
-            this.psCard = connection.prepareStatement("""
-                INSERT INTO card (
-                    id,
-                    public_id,
-                    identity_hash,
-                    identity_version,
-                    name,
-                    card_type,
-                    faction,
-                    energy_cost,
-                    attack,
-                    defense,
-                    power_score
-                )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """);
+	        this.psCard = connection.prepareStatement("""
+	            INSERT INTO card (
+	                id, public_id, identity_hash, identity_version,
+	                name, card_type, faction, energy_cost,
+	                attack, defense, power_score
+	            )
+	            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	        """);
 
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
+	    } catch (SQLException e) {
+	        throw new RuntimeException(e);
+	    }
+	}
 
 	
 	
@@ -260,9 +252,10 @@ public class JdbcCardDao {
         return result;
     }
     public Card rebuildCard(CardDbRow row) throws SQLException {
-    	Connection c_tmp = DbUtil.getConnection();
-    	Set<Keyword> keywords = loadKeywords(row.id, c_tmp);
-    	List<CardEffect> effects = loadEffects(row.id, c_tmp);
+
+        Set<Keyword> keywords = loadKeywords(row.id, connection);
+        List<CardEffect> effects = loadEffects(row.id, connection);
+
         return new CardBuilder()
             .withId(row.id)
             .withPublicId(row.publicId)
@@ -272,11 +265,12 @@ public class JdbcCardDao {
             .withEnergyCost(row.energyCost)
             .withAttack(row.attack)
             .withDefense(row.defense)
-            .withKeywords(keywords)   
-            .withEffects(effects)   
+            .withKeywords(keywords)
+            .withEffects(effects)
             .withPowerScore(row.powerScore)
             .build();
     }
+
     private void insertKeywords(Card card, Connection c) throws SQLException {
 
         if (card.getKeywords().isEmpty()) {
@@ -422,7 +416,7 @@ public class JdbcCardDao {
     	        }
     	    }
     	}
-    public static CardDbRow pickRandom(
+    public CardDbRow pickRandom(
     	    
     	    CardType type,
     	    int mana,
@@ -430,41 +424,39 @@ public class JdbcCardDao {
     	) throws SQLException {
 
     	    String sql = """
-    	        SELECT
-    	        id,
-                identity_hash,
-                public_id,
-                name,
-                card_type,
-                faction,
-                energy_cost,
-                attack,
-                defense,
-                power_score
-    	        FROM card
-    	        WHERE card_type = ?
-    	          AND energy_cost = ?
-    	          AND faction = ?
-    	        ORDER BY RANDOM()
-    	        LIMIT 1
+    	        WITH candidates AS (
+    SELECT c.id
+    FROM card c
+    WHERE c.card_type = ?
+      AND c.energy_cost = ?
+      AND c.faction = ?
+      AND NOT EXISTS (
+          SELECT 1
+          FROM card_effect ce
+          JOIN card_effect_constraint cec
+            ON cec.effect_id = ce.id
+          WHERE ce.card_id = c.id
+            AND cec.constraint_type LIKE 'FACTION_%'
+      )
+)
+SELECT c.*
+FROM card c
+JOIN candidates ca ON ca.id = c.id
+OFFSET floor(random() * (SELECT count(*) FROM candidates))
+LIMIT 1
     	    """;
     	    
-    	    try (
-    	    		Connection c = DbUtil.getConnection();
-    	    		PreparedStatement ps = c.prepareStatement(sql)) {
+    	    try (PreparedStatement ps = connection.prepareStatement(sql)) {
 
     	        ps.setString(1, type.name());
     	        ps.setInt(2, mana);
     	        ps.setString(3, faction.name());
 
     	        try (ResultSet rs = ps.executeQuery()) {
-
-    	        	if (!rs.next()) {
-    	                return null;
-    	            }
+    	            if (!rs.next()) return null;
 
     	            return new CardDbRow(
-    	            	UUID.fromString(rs.getString("id")),
+    	                UUID.fromString(rs.getString("id")),
     	                rs.getString("identity_hash"),
     	                rs.getString("public_id"),
     	                rs.getString("name"),
@@ -477,9 +469,8 @@ public class JdbcCardDao {
     	            );
     	        }
     	    }
-
-    	   
     	}
+    
     private static class CardEffectBuilderData {
 
         final TriggerType trigger;
@@ -530,7 +521,7 @@ public class JdbcCardDao {
             connection.commit(); // 🔥 COMMIT DES EFFETS (OBLIGATOIRE)
 
             pendingCards.clear();
-            batchCount = 0;
+            //batchCount = 0;
 
         } catch (SQLException e) {
             rollbackQuietly();

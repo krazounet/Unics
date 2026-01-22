@@ -12,59 +12,60 @@ import unics.Enum.Faction;
 
 public class Booster18DB extends Booster {
 
-	JdbcCardDao dao= new JdbcCardDao();
-	int index = 0;
-	List<Faction> factions = FactionDistribution.generate(List.of(12, 6));
-	
-    public Booster18DB(ThreadLocalRandom random) {
+    private final JdbcCardDao dao;
+    private int index = 0;
+    private final List<Faction> factions;
+
+    public Booster18DB(ThreadLocalRandom random, JdbcCardDao dao) {
         super(random);
+        this.dao = dao;
+        this.manacurve = new BoosterManaCurve(18, manaCurveProfile).getCurve();
+        this.cards = new ArrayList<>();
+        this.factions = FactionDistribution.generate(List.of(12, 6));
+    }
 
-        manacurve = new BoosterManaCurve(18, manaCurveProfile).getCurve();
-        
+    public void generate() {
+        for (int i = 0; i < 10; i++) addFromDB(CardType.UNIT);
+        for (int i = 0; i < 3; i++) addFromDB(CardType.STRUCTURE);
+        for (int i = 0; i < 2; i++) addFromDB(CardType.ACTION);
 
-        cards = new ArrayList<>();
-        
-
-        for (int i = 0; i < 10; i++) 
-        	addFromDB(CardType.UNIT);
-     
-
-        for (int i = 0; i < 3; i++)
-        	addFromDB(CardType.STRUCTURE);
-             for (int i = 0; i < 2; i++)
-        	addFromDB(CardType.ACTION);
-             for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 3; i++) {
             CardType type = random.nextInt(100) < 33 ? CardType.UNIT
-                    : random.nextInt(100) < 66 ? CardType.ACTION
-                    : CardType.STRUCTURE;
-
+                : random.nextInt(100) < 66 ? CardType.ACTION
+                : CardType.STRUCTURE;
             addFromDB(type);
         }
     }
-    
+
     private void addFromDB(CardType type) {
+        if (index >= manacurve.size()) {
+            throw new IllegalStateException("Dépassement de la courbe de mana");
+        }
 
         int mana = manacurve.get(index);
         Faction faction = factions.get(index);
         index++;
 
         try {
-            CardDbRow row = JdbcCardDao.pickRandom(type, mana, faction);
+            CardDbRow row = dao.pickRandom(type, mana, faction);
 
             if (row == null) {
-                //cards.add(generateValidatedCard(type, mana, faction));
-            	 throw new IllegalStateException("Impossible de générer une carte valide "+type+ "/"+mana+"/"+faction);
+                throw new IllegalStateException(
+                    "Impossible de générer une carte valide "
+                    + type + "/" + mana + "/" + faction
+                );
             }
 
-            Card card = dao.rebuildCard(row);
-            cards.add(card);
+            cards.add(dao.rebuildCard(row));
 
         } catch (SQLException e) {
-            // log + fallback
-        	System.err.println("fallback Booster18DB");
-            cards.add(CardGenerator.generateValidatedCard(type, mana, faction,random));
+            System.err.println("fallback Booster18DB");
+            cards.add(
+                CardGenerator.generateValidatedCard(
+                    type, mana, faction, random
+                )
+            );
         }
     }
-
-    
 }
+

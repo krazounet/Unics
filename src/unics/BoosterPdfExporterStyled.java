@@ -14,6 +14,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 
+import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.io.source.ByteArrayOutputStream;
@@ -35,13 +36,12 @@ import com.itextpdf.layout.element.Div;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.properties.ObjectFit;
 import com.itextpdf.layout.properties.Property;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
-import com.itextpdf.layout.element.Text;
-
 
 import unics.Enum.CardType;
 import unics.Enum.Faction;
@@ -75,363 +75,269 @@ public class BoosterPdfExporterStyled {
     private static final float BACK_OFFSET_Y =  -2.8f; // +1 mm
 
     
-    public static void exportBoosterToPdf(Booster cards, String outputPath,List<Path> imagePaths) {
+    public static void exportBoosterToPdf(
+            Booster cards,
+            String outputPath,
+            List<Path> imagePaths) {
 
         try {
-          
-            
+
             WriterProperties props = new WriterProperties()
                     .setCompressionLevel(9)
                     .setFullCompressionMode(true);
 
             PdfWriter writer = new PdfWriter(outputPath, props);
             PdfDocument pdf = new PdfDocument(writer);
-
-            
             Document document = new Document(pdf, PageSize.A4);
             document.setMargins(18, 18, 18, 18);
 
-            // Polices
-            PdfFont bold = PdfFontFactory.createFont();
-           
+            PdfFont normal_font = PdfFontFactory.createFont();
+            PdfFont bold   = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
 
-            Table table = new Table(UnitValue.createPercentArray(3))
+            Table pageTable = new Table(UnitValue.createPercentArray(3))
                     .setWidth(UnitValue.createPercentValue(100));
 
             int index = 0;
 
             for (Card card : cards.getCards()) {
 
-                /* ───── Cellule ───── */
-            	Cell cell = new Cell()
-            		    .setPadding(4)
-            		    .setHeight(CARD_HEIGHT + 8)
-            		    .setVerticalAlignment(VerticalAlignment.TOP);
+                /* ───── CELLULE DE PAGE ───── */
+                Cell pageCell = new Cell()
+                        .setPadding(4)
+                        .setHeight(CARD_HEIGHT + 8)
+                        .setVerticalAlignment(VerticalAlignment.TOP);
 
-                /* ───── Carte (hauteur FIXE) ───── */
-               
-            	// Cadre externe
-            	Div cardDiv = new Div()
-            	    .setHeight(CARD_HEIGHT)
-            	    .setPadding(3)
-            	    .setBorder(new SolidBorder(1));
+                /* ───── CARTE ───── */
+                Div cardDiv = new Div()
+                        .setHeight(CARD_HEIGHT)
+                        .setPadding(3)
+                        .setBorder(new SolidBorder(1));
 
-            	// Cadre interne
-            	Div innerFrame = new Div()
-            	    .setPadding(0)
-            	    .setHeight(UnitValue.createPercentValue(100))
-            	    .setBorder(new SolidBorder(
-            	    	    borderColorForFaction(card.getFaction()), 1));
+                Div innerFrame = new Div()
+                        .setBorder(new SolidBorder(
+                                borderColorForFaction(card.getFaction()), 1));
 
-            	// Fond teinté (bloc visuel)
-            	Div backgroundLayer = new Div()
-            	    .setBackgroundColor(colorForFaction(card.getFaction()))
-            	    .setOpacity(bgOpacityForFaction(card.getFaction()))
-            	    .setMinHeight(UnitValue.createPercentValue(100));
+                cardDiv.add(innerFrame);
+                pageCell.add(cardDiv);
+                pageTable.addCell(pageCell);
 
-            	// Contenu (NE PAS fixer la hauteur)
-            	Div contentLayer = new Div()
-            		    .setPadding(2)
-            		    ;
-            	
-            	// Ordre
-            	innerFrame.add(backgroundLayer);
-            	innerFrame.add(contentLayer);
-            	cardDiv.add(innerFrame);
-
-
-                /* ───── Header ───── */
-               
+                /* ───── HEADER ───── */
                 Table header = new Table(UnitValue.createPercentArray(new float[]{85, 15}))
-                	    .setWidth(UnitValue.createPercentValue(100));
+                        .setWidth(UnitValue.createPercentValue(100))
+                        .setBackgroundColor(colorForFaction(card.getFaction()));
 
                 header.addCell(new Cell()
                         .add(new Paragraph(shortName(card.getName()))
-                                .setFont(bold)
+                                .setFont(normal_font)
                                 .setFontSize(11))
                         .setBorder(Border.NO_BORDER));
-                Color factionColor = colorForFaction(card.getFaction());
 
-                header.setBackgroundColor(factionColor);
+                Table energyTable = new Table(UnitValue.createPercentArray(new float[]{1, 1}))
+                        .setWidth(UnitValue.createPercentValue(100));
 
-
-                Cell energyCell = new Cell()
-                	    .setBorder(Border.NO_BORDER)
-                	    .setBackgroundColor(new DeviceRgb(60, 60, 60))
-                	    .setPadding(0)
-                	    .setVerticalAlignment(VerticalAlignment.MIDDLE);
-
-                	Table energyTable = new Table(UnitValue.createPercentArray(new float[]{1, 1}))
-                	    .setWidth(UnitValue.createPercentValue(100));
-
-                	energyTable.addCell(new Cell()
-                	    .setBorder(Border.NO_BORDER)
-                	    .setTextAlignment(TextAlignment.CENTER)
-                	    .add(icon(ICON_ENERGY, 9)));
-
-                	energyTable.addCell(new Cell()
-                	    .setBorder(Border.NO_BORDER)
-                	    .setTextAlignment(TextAlignment.CENTER)
-                	    .add(new Paragraph(String.valueOf(card.getEnergyCost()))
-                	        .setFont(bold)
-                	        .setFontSize(10)
-                	        .setFontColor(ColorConstants.WHITE)
-                	        .setMargin(0)));
-
-                	energyCell.add(energyTable);
-                	header.addCell(energyCell);
-
-                
-                	contentLayer.add(header);
-
-                /* ───── Sous-header ───── */
-               
-                	//contentLayer.add(new Paragraph(card.getFaction() + " • " + card.getCardType())
-                			contentLayer.add(new Paragraph(" • ")
-                			.setFontSize(2)
-                        .setFontColor(new DeviceRgb(90, 90, 90))
+                energyTable.addCell(new Cell()
+                        .add(icon(ICON_ENERGY, 9))
                         .setTextAlignment(TextAlignment.CENTER)
-                        .setMarginBottom(0));
-				
-                /* ───── Illustration ───── */
-               
+                        .setBorder(Border.NO_BORDER));
+
+                energyTable.addCell(new Cell()
+                        .add(new Paragraph(String.valueOf(card.getEnergyCost()))
+                                .setFont(normal_font)
+                                .setFontSize(10)
+                                .setFontColor(ColorConstants.WHITE))
+                        .setTextAlignment(TextAlignment.CENTER)
+                        .setBorder(Border.NO_BORDER));
+
+                header.addCell(new Cell()
+                        .add(energyTable)
+                        .setBackgroundColor(new DeviceRgb(60, 60, 60))
+                        .setBorder(Border.NO_BORDER));
+
+                innerFrame.add(header);
+
+                /* ───── ILLUSTRATION ───── */
                 Div illustrationBox = new Div()
-                	    .setWidth(UnitValue.createPercentValue(100))
-                	    .setHeight(ILLUSTRATION_HEIGHT)
-                	    .setBorder(new SolidBorder(0.5f))
-                	    .setMarginBottom(1);
-                
+                        .setHeight(ILLUSTRATION_HEIGHT)
+                        .setBorder(new SolidBorder(0.5f));
+
                 if (index < imagePaths.size() && imagePaths.get(index) != null) {
-                    Path imagePath = imagePaths.get(index);
+                    ImageData imgData = loadOptimizedImage(
+                            imagePaths.get(index).toAbsolutePath().toString(),
+                            900,
+                            500,
+                            0.8f);
 
-                    ImageData imageData = loadOptimizedImage(
-                            imagePath.toAbsolutePath().toString(),
-                            900,        // largeur utile réelle
-                            500,        // hauteur utile
-                            0.8f        // qualité JPEG
-                    );
-
-                    Image image = new Image(imageData);
-
-                 // 👉 remplit EXACTEMENT la box
-                 image.setWidth(UnitValue.createPercentValue(100));
-                 image.setHeight(UnitValue.createPercentValue(100));
-
-                 // 👉 crop intelligent
-                 image.setProperty(Property.OBJECT_FIT, ObjectFit.COVER);
-
-                 // 👉 pas de marges implicites
-
-                 image.setPadding(0);
-                 image.setBorder(Border.NO_BORDER);
-
-                 illustrationBox.add(image);
-                } else {
-                    // Fallback si image manquante
-                    illustrationBox.setBackgroundColor(colorForFaction(card.getFaction()))
-                                   .setOpacity(0.15f);
+                    Image img = new Image(imgData);
+                    img.setWidth(UnitValue.createPercentValue(100));
+                    img.setHeight(UnitValue.createPercentValue(100));
+                    img.setProperty(Property.OBJECT_FIT, ObjectFit.COVER);
+                    illustrationBox.add(img);
                 }
 
-                contentLayer.add(illustrationBox);
-                /* ───── Texte (zone FIXE + police adaptative) ───── */
-               
-                Div textBox = new Div()
-                	    //.setMaxHeight(72)   // 🔒 LIMITE, pas obligation
-                		.setHeight(90)
-                		.setBackgroundColor(backgroundColorForFaction(card.getFaction()))
-                	    .setMarginBottom(6);
+                innerFrame.add(illustrationBox);
 
-                int totalTextLength = 0;
+                /* ───── RULES + FOOTER (TABLE VERTICALE) ───── */
+                float RULES_ZONE_HEIGHT =
+                        CARD_HEIGHT
+                      - ILLUSTRATION_HEIGHT
+                      - STATS_HEIGHT
+                      ; // header + marges
+
+                Table rulesAndFooter = new Table(UnitValue.createPercentArray(1))
+                        .setWidth(UnitValue.createPercentValue(100))
+                        .setHeight(RULES_ZONE_HEIGHT);
+
+                /* ───── RULES CELL ───── */
+                Cell rulesCell = new Cell()
+                        .setBorder(Border.NO_BORDER)
+                        //.setHeight()
+                        .setBackgroundColor(backgroundColorForFaction(card.getFaction()))
+                        .setPadding(4)
+                        .setVerticalAlignment(VerticalAlignment.TOP);
 
                 if (!card.getKeywords().isEmpty()) {
                     String kw = card.getKeywords().stream()
                             .map(Keyword::getDisplayName)
                             .reduce((a, b) -> a + " · " + b)
                             .orElse("");
-
-                    totalTextLength += kw.length();
-
-                    textBox.add(new Paragraph(kw)
+                    Paragraph kwPara = new Paragraph()
+                            .setFontSize(8)
+                            .setMarginBottom(4);
+                    Text kwText = new Text(kw)
+                            .setFont(bold);   // 👈 ICI
+                    kwPara.add(kwText);
+                    rulesCell.add(kwPara);
+                    /*
+                    rulesCell.add(new Paragraph(kw)
                             .setFont(bold)
                             .setFontSize(8)
-                            .setMarginBottom(2));
+                            .setMarginBottom(4));*/
                 }
+
+                int totalLen = card.getEffects().stream()
+                        .mapToInt(e -> e.toDisplayString().length())
+                        .sum();
+
+                float effectFontSize = adaptiveFontSize(totalLen);
 
                 for (CardEffect effect : card.getEffects()) {
-                    totalTextLength += effect.toDisplayString().length();
+                    Paragraph p = new Paragraph()
+                            .setFontSize(effectFontSize)
+                            .setMarginBottom(3);
+
+                    p.add(new Text(effect.getTrigger()
+                            .getShortDisplay(effect.getConditionKeyword()))
+                            .setUnderline());
+                    p.add(" ");
+
+                    for (String mot : effect.getEffectText().split(" ")) {
+                        switch (mot) {
+                            case "énergie", "énergies" ->
+                                    p.add(createIcon("resources/images/icons/energy.png"));
+                            case "dégât", "dégâts" ->
+                                    p.add(createIcon("resources/images/icons/hit.png"));
+                            case "PC" ->
+                                    p.add(createIcon("resources/images/icons/PC.png"));
+                            default ->
+                                    p.add(new Text(mot));
+                        }
+                        p.add(" ");
+                    }
+                    rulesCell.add(p);
                 }
 
-                float effectFontSize = adaptiveFontSize(totalTextLength);
+                /* ───── FOOTER CELL ───── */
+                Cell footerCell = new Cell()
+                        .setHeight(STATS_HEIGHT)
+                        .setBorder(Border.NO_BORDER)
+                        .setPadding(0);
 
-                for (CardEffect effect : card.getEffects()) {
+                footerCell.add(buildStatsTable(card, normal_font));
 
-                	Paragraph p = new Paragraph()
-                	        .setFontSize(effectFontSize)
-                	        .setMarginBottom(2);
-                	Text txt_trigger = new Text(effect.getTrigger().getShortDisplay(effect.getConditionKeyword())).setUnderline();
-                	p.add(txt_trigger);
-                	String txt_effect=effect.getEffectText();
-                	for (String mot : txt_effect.split(" ")) {
-                	    switch (mot) {
-                	        case "énergie":
-                	            p.add(createIcon("resources/images/icons/energy.png"));
-                	            break;
-                	        case "énergies":
-                	            p.add(createIcon("resources/images/icons/energy.png"));
-                	            break;
-                	        case "dégât":
-                	            p.add(createIcon("resources/images/icons/hit.png"));
-                	            break;
-                	        case "dégâts":
-                	            p.add(createIcon("resources/images/icons/hit.png"));
-                	            break;
-                	        case "PC":
-                	            p.add(createIcon("resources/images/icons/PC.png"));
-                	            break;    
-                	       /*
-                	        case "Piochez":
-                	            p.add(createIcon("resources/images/icons/pioche.png"));
-                	            break;    
-                	        case "Défaussez":
-                	            p.add(createIcon("resources/images/icons/defausse.png"));
-                	            break;
-                	           */    
-                	        default:
-                	            p.add(new Text(mot));
-                	    }
-                	    p.add(" "); // espace entre mots
-                	}
-                	//p.add(effect.getEffectText());
-                	textBox.add(p);
+                rulesAndFooter.addCell(rulesCell);
+                rulesAndFooter.addCell(footerCell);
 
-                }
-
-                
-                Div footerZone = new Div()
-                	    .setHeight(STATS_HEIGHT)
-                	    .setMarginTop(6)
-                	    .setKeepTogether(true); // 🔒 IMPORTANT
-
-                	contentLayer.add(footerZone);    
-                	contentLayer.add(textBox);
-                /* ───── Type spécifique ───── */
-                	if (card.getCardType() == CardType.UNIT) {
-
-                	    Table stats = new Table(UnitValue.createPercentArray(new float[]{1, 1,1}))
-                	        .setWidth(UnitValue.createPercentValue(100))
-                	        .setHeight(STATS_HEIGHT)
-                	        .setBackgroundColor(new DeviceRgb(245, 245, 245));
-
-                	    stats.addCell(statCellIcon(ICON_ATTACK, card.getAttack(), bold)
-                	        .setBorderRight(new SolidBorder(0.5f)));
-
-                	    stats.addCell(statCellIcon(ICON_DEFENSE, card.getDefense(), bold)
-                	        .setBorderLeft(new SolidBorder(0.5f)));
-                	    
-                	    Paragraph p = new Paragraph()
-                	            .setTextAlignment(TextAlignment.RIGHT)
-                	            .setMargin(0)
-                	            .setFont(bold)
-                	            .setFontSize(6);
-                	   
-                	    p.add(new Text(card.getFaction()+"\n UNIT"));
-                	   // p.add(createIcon("resources/images/icons/faction/ORGANIC.png"));
-                	    Cell c =new Cell()
-                        	    .setBorder(new SolidBorder(0.5f))
-                        	    .setBackgroundColor(new DeviceRgb(245, 245, 245))
-                        	    .setPadding(4)
-                        	    .add(p);
-                	    stats.addCell(c);
-                    	    
-
-                	    footerZone.add(stats);
-                	} else if (card.getCardType() == CardType.STRUCTURE) {
-                		Table stats = new Table(UnitValue.createPercentArray(new float[]{1,1}))
-                    	        .setWidth(UnitValue.createPercentValue(100))
-                    	        .setHeight(STATS_HEIGHT)
-                    	        .setBackgroundColor(new DeviceRgb(245, 245, 245));
-                		stats.addCell(statCellIcon(ICON_DEFENSE, card.getDefense(), bold)
-                    	        .setBorderLeft(new SolidBorder(0.5f)));
-                		
-                		Paragraph p = new Paragraph()
-                	            .setTextAlignment(TextAlignment.RIGHT)
-                	            .setMargin(0)
-                	            .setFont(bold)
-                	            .setFontSize(6);
-                	    
-                	    p.add(""+card.getFaction()+"\n STRUCTURE");
-                	    Cell c =new Cell()
-                        	    .setBorder(new SolidBorder(0.5f))
-                        	    .setBackgroundColor(new DeviceRgb(245, 245, 245))
-                        	    .setPadding(4)
-                        	    .add(p);
-                	    stats.addCell(c);
-                    	    
-
-                	    footerZone.add(stats);
-                	}else if (card.getCardType() == CardType.ACTION) {
-                		Table stats = new Table(UnitValue.createPercentArray(new float[]{1}))
-                    	        .setWidth(UnitValue.createPercentValue(100))
-                    	        .setHeight(STATS_HEIGHT)
-                    	        .setBackgroundColor(new DeviceRgb(245, 245, 245));
-                		Paragraph p = new Paragraph()
-                	            .setTextAlignment(TextAlignment.CENTER)
-                	            .setMargin(0)
-                	            .setFont(bold)
-                	            .setFontSize(6);
-                	    
-                	    p.add(""+card.getFaction()+"\n ACTION");
-                	    Cell c =new Cell()
-                        	    .setBorder(new SolidBorder(0.5f))
-                        	    .setBackgroundColor(new DeviceRgb(245, 245, 245))
-                        	    .setPadding(4)
-                        	    .add(p);
-                	    stats.addCell(c);
-                    	    
-
-                	    footerZone.add(stats);
-                	}
-
-                
-
-                cell.add(cardDiv);
-                table.addCell(cell);
+                innerFrame.add(rulesAndFooter);
 
                 index++;
 
                 if (index % 9 == 0) {
-                    // Recto
-                    document.add(table);
-
-                    // Verso
+                    document.add(pageTable);
                     document.add(new AreaBreak());
                     addBackPage(document);
-                    
-                    if (index < cards.cards.size()) {
-                    // Nouvelle page recto
-                    document.add(new AreaBreak());
-                    table = new Table(UnitValue.createPercentArray(3))
+                    if (index < cards.getCards().size()) {
+                    	document.add(new AreaBreak());
+                    	pageTable = new Table(UnitValue.createPercentArray(3))
                             .setWidth(UnitValue.createPercentValue(100));
                     }
+                    
                 }
-
-            }
-
-            if (index % 9 != 0) {
-                document.add(table);
             }
             
-            if (index < cards.cards.size()) {
-            	// Verso
-            	document.add(new AreaBreak());
-            	addBackPage(document);
-            }
+
             document.close();
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Erreur génération PDF", e);
         }
     }
+
+
+
+    private static Table buildStatsTable(Card card, PdfFont bold) throws IOException {
+
+        if (card.getCardType() == CardType.UNIT) {
+
+            Table t = new Table(UnitValue.createPercentArray(new float[]{1, 1, 1}))
+                    .setWidth(UnitValue.createPercentValue(100))
+                    .setHeight(STATS_HEIGHT);
+
+            t.addCell(statCellIcon(ICON_ATTACK, card.getAttack(), bold));
+            t.addCell(statCellIcon(ICON_DEFENSE, card.getDefense(), bold));
+
+            t.addCell(new Cell()
+                    .add(new Paragraph(card.getFaction() + "\nUNIT")
+                            .setFont(bold)
+                            .setFontSize(6)
+                            .setTextAlignment(TextAlignment.RIGHT))
+                    .setPadding(4));
+
+            return t;
+        }
+
+        if (card.getCardType() == CardType.STRUCTURE) {
+
+            Table t = new Table(UnitValue.createPercentArray(new float[]{1, 1}))
+                    .setWidth(UnitValue.createPercentValue(100))
+                    .setHeight(STATS_HEIGHT);
+
+            t.addCell(statCellIcon(ICON_DEFENSE, card.getDefense(), bold));
+
+            t.addCell(new Cell()
+                    .add(new Paragraph(card.getFaction() + "\nSTRUCTURE")
+                            .setFont(bold)
+                            .setFontSize(6)
+                            .setTextAlignment(TextAlignment.RIGHT))
+                    .setPadding(4));
+
+            return t;
+        }
+
+        // ACTION (ou autre)
+        Table t = new Table(UnitValue.createPercentArray(1))
+                .setWidth(UnitValue.createPercentValue(100))
+                .setHeight(STATS_HEIGHT);
+
+        t.addCell(new Cell()
+                .add(new Paragraph(card.getFaction() + "\n" + card.getCardType())
+                        .setFont(bold)
+                        .setFontSize(6)
+                        .setTextAlignment(TextAlignment.CENTER))
+                .setPadding(4));
+
+        return t;
+    }
+
 
     
  
@@ -574,15 +480,7 @@ public class BoosterPdfExporterStyled {
         };
     }
 
-    private static float bgOpacityForFaction(Faction faction) {
-        return switch (faction) {
-            case ORGANIC -> 0.07f;
-            case ASTRAL -> 0.06f;
-            case OCCULT -> 0.06f;
-            case NOMAD -> 0.05f;
-            case MECHANICAL -> 0.04f;
-        };
-    }
+
 
     private static ImageData loadOptimizedImage(
             String path,

@@ -286,6 +286,10 @@ public abstract class CardGenerator {
         if (card.getCardType() == CardType.ACTION && !card.getKeywords().isEmpty()) {
             return false;
         }
+        //trample et atk a 1
+        if (card.getKeywords().contains(Keyword.TRAMPLE) && card.getAttack() <= INITIAL_DEF) {
+        	    return false;
+        	}
 
         return true;
     }

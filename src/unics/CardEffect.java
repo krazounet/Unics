@@ -27,8 +27,7 @@ public class CardEffect {
 
     // Ciblage avancé
     private final TargetType targetType; // SELF, ALLY, ENEMY
-    //private final CardFilter filter;      // optionnel
-    //private CardFilterType filterType;
+
     
     private final Set<TargetConstraint> constraints;
     
@@ -160,10 +159,14 @@ public class CardEffect {
         }
         // 4️⃣ TargetType
         TargetType targetType = switch (ability) {
-            case BUFF, MOVE_ALLY,TAP_ALLY,UNTAP_ALLY -> TargetType.ALLY;
+            case BUFF, MOVE_ALLY,TAP_ALLY,UNTAP_ALLY 
+            		-> TargetType.ALLY;
+            
             case 	DAMAGE_UNIT_ENEMY, MOVE_ENEMY, DEBUFF_ENEMY,ENERGY_LOSS_ENEMY,
             		ENERGY_GAIN_ENEMY,DISCARD_ENEMY,DESTROY_STRUCTURE_ENEMY,
-            		DESTROY_UNIT_ENEMY,TAP_ENEMY,UNTAP_ENEMY -> TargetType.ENEMY;
+            		DESTROY_UNIT_ENEMY,TAP_ENEMY,UNTAP_ENEMY 
+            		-> TargetType.ENEMY;
+            		
             default -> TargetType.SELF;
         };
 
