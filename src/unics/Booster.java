@@ -50,18 +50,7 @@ public abstract class Booster {
         }
         return cards;
     }
-    /*
-    private Card generateValidatedCard(CardType type, int cost) {
-        //Card bestCard = null;
-        for (int i = 0; i < NB_ESSAI_CARTE; i++) {
-            Card candidate = CardGenerator.generateCard(type,cost,random);//ici agir sur le cout
-            if (CardGenerator.isValid(candidate)) {
-                return candidate;
-            }
-        }
-        throw new IllegalStateException("Impossible de générer une carte valide "+type+ "/"+cost);
-    }
-	*/
+
     
     
 	public List<Card> getCards() {
@@ -72,6 +61,6 @@ public abstract class Booster {
 		return publicId;
 	}
     
-    
+	 public void generate() {}
     
 }

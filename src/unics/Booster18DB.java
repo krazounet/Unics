@@ -23,7 +23,7 @@ public class Booster18DB extends Booster {
         this.cards = new ArrayList<>();
         this.factions = FactionDistribution.generate(List.of(12, 6));
     }
-
+    @Override
     public void generate() {
         for (int i = 0; i < 10; i++) addFromDB(CardType.UNIT);
         for (int i = 0; i < 3; i++) addFromDB(CardType.STRUCTURE);

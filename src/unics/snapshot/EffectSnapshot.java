@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import unics.Enum.AbilityType;
 import unics.Enum.Keyword;
-import unics.Enum.TargetConstraint;
+import unics.Enum.EffectConstraint;
 import unics.Enum.TargetType;
 import unics.Enum.TriggerType;
 
@@ -23,7 +23,7 @@ public final class EffectSnapshot {
 
     // ===== CIBLAGE =====
     public final TargetType targetType;
-    public final Set<TargetConstraint> constraints;
+    public final Set<EffectConstraint> constraints;
 
     public EffectSnapshot(
         TriggerType trigger,
@@ -31,7 +31,7 @@ public final class EffectSnapshot {
         AbilityType ability,
         Integer value,
         TargetType targetType,
-        Set<TargetConstraint> constraints
+        Set<EffectConstraint> constraints
     ) {
         this.trigger = trigger;
         this.conditionKeyword = conditionKeyword;
@@ -47,7 +47,7 @@ public final class EffectSnapshot {
         @JsonProperty("ability") AbilityType ability,
         @JsonProperty("value") int value,
         @JsonProperty("targetType") TargetType targetType,
-        @JsonProperty("constraints") Set<TargetConstraint> constraints
+        @JsonProperty("constraints") Set<EffectConstraint> constraints
     ) {
         this.trigger = trigger;
         this.conditionKeyword = conditionKeyword;

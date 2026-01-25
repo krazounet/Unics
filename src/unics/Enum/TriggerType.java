@@ -81,7 +81,7 @@ public enum TriggerType {
         -20,
         EnumSet.of(CardType.UNIT)
     ),
-
+    /*
     POSITION_FRONT(
         "En position avant",
         "La capacité se déclenche uniquement si la carte est en position avant",
@@ -102,7 +102,7 @@ public enum TriggerType {
         -5,
         EnumSet.of(CardType.UNIT)
     ),
-
+	*/
     ON_ACTIVATION(
         "Activation",
         "La capacité se déclenche quand le joueur choisit de l’activer",
@@ -116,7 +116,7 @@ public enum TriggerType {
         -10,
         EnumSet.of(CardType.UNIT, CardType.STRUCTURE)
     ),
-
+    /*
     ALLIED_UNIT_PRESENT(
         "Si une unité alliée est en jeu",
         "La capacité se déclenche si une unité alliée spécifique est présente",
@@ -130,7 +130,7 @@ public enum TriggerType {
         -10,
         EnumSet.of(CardType.UNIT, CardType.STRUCTURE)
     ),
-
+	*/
     PC_DAMAGED(
         "Quand vous perdez des PC ",
         "La capacité se déclenche lorsque les points de commandement changent",
@@ -179,7 +179,7 @@ public enum TriggerType {
             case ON_TURN_START -> "Au début de votre tour";
             case ON_TURN_END -> "À la fin de votre tour";
             case ON_MOVE -> "Quand cette carte change de position";
-            case KEYWORD_PRESENT -> "Si une de vos carte a "+kw.name();
+            case KEYWORD_PRESENT -> "Activation si une de vos carte a "+kw.name();
             default -> getDisplayName();
         };
     }

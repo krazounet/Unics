@@ -21,7 +21,7 @@ import unics.Enum.AbilityType;
 import unics.Enum.CardType;
 import unics.Enum.Faction;
 import unics.Enum.Keyword;
-import unics.Enum.TargetConstraint;
+import unics.Enum.EffectConstraint;
 import unics.Enum.TargetType;
 import unics.Enum.TriggerType;
 
@@ -335,7 +335,7 @@ public class JdbcCardDao implements AutoCloseable  {
                 eps.setString(7, e.getTargetType().name());
                 eps.addBatch();
 
-                for (TargetConstraint cst : e.getConstraints()) {
+                for (EffectConstraint cst : e.getConstraints()) {
                     cps.setObject(1, eid);
                     cps.setString(2, cst.name());
                     cps.addBatch();
@@ -409,8 +409,8 @@ public class JdbcCardDao implements AutoCloseable  {
 
     	        while (rs.next()) {
     	            UUID eid = UUID.fromString(rs.getString("effect_id"));
-    	            TargetConstraint cst =
-    	                TargetConstraint.valueOf(rs.getString("constraint_type"));
+    	            EffectConstraint cst =
+    	                EffectConstraint.valueOf(rs.getString("constraint_type"));
 
     	            effects.get(eid).constraints.add(cst);
     	        }
@@ -478,7 +478,7 @@ LIMIT 1
         final AbilityType ability;
         final Integer value;
         final TargetType targetType;
-        final Set<TargetConstraint> constraints = new HashSet<>();
+        final Set<EffectConstraint> constraints = new HashSet<>();
 
         CardEffectBuilderData(
             TriggerType trigger,

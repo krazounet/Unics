@@ -9,8 +9,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import unics.Enum.AbilityType;
 import unics.Enum.CardType;
+import unics.Enum.EffectConstraint;
 import unics.Enum.Keyword;
-import unics.Enum.TargetConstraint;
 import unics.Enum.TargetType;
 import unics.Enum.TriggerType;
 
@@ -29,11 +29,11 @@ public class CardEffect {
     private final TargetType targetType; // SELF, ALLY, ENEMY
 
     
-    private final Set<TargetConstraint> constraints;
+    private final Set<EffectConstraint> constraints;
     
     private static int MODIFIER_CONTRAINTE_NEGATIVE = -30; //exprimé en %, arbitraire pour le moment
     
-    public Set<TargetConstraint> getConstraints() {
+    public Set<EffectConstraint> getConstraints() {
 		return constraints;
 	}
 
@@ -43,7 +43,7 @@ public class CardEffect {
             AbilityType ability,
             int value,
             TargetType targetType,
-            Set<TargetConstraint> constraints
+            Set<EffectConstraint> constraints
         ) {
             this.trigger = trigger;
             this.conditionKeyword=conditionKeyword;
@@ -87,24 +87,7 @@ public class CardEffect {
             Set<Keyword> keywords
     ) {
     	
-    	
-    	
-    	
-    	List<TargetConstraint> factionConstraints = List.of(
-    		    TargetConstraint.FACTION_ASTRAL,
-    		    TargetConstraint.FACTION_ORGANIC,
-    		    TargetConstraint.FACTION_NOMAD,
-    		    TargetConstraint.FACTION_MECHANICAL,
-    		    TargetConstraint.FACTION_OCCULT
-    		);
-
-    		List<TargetConstraint> costConstraints = List.of(
-    		    TargetConstraint.COST_1_OR_LESS,
-    		    TargetConstraint.COST_2_OR_LESS,
-    		    TargetConstraint.COST_3_OR_LESS
-    		);
-    	
-
+    
 
         // 2️⃣ AbilityType compatible
         List<AbilityType> abilities = Arrays.stream(AbilityType.values())
@@ -187,46 +170,51 @@ public class CardEffect {
          * - il ne sert a rien de faire 17 mouvements
          */
         value = Math.min(value, ability.maxValue());
-        // 6️⃣ Contraintes
-     // Contraintes obligatoires (ex : UNIT / STRUCTURE)
-        Set<TargetConstraint> constraints = new HashSet<>();
-        //constraints.addAll(ability.getMandatoryConstraints());
 
-   
         
+        // 6️⃣ Contraintes
 
+        Set<EffectConstraint> constraints = new HashSet<>();
+        List<EffectConstraint> pool1 = new ArrayList<>();
+        boolean targetsCard = ability.isTargetingACard();
+
+        int constraintCount;
         int roll = random.nextInt(100);
 
-        boolean useFaction = false;
-        boolean useCost = false;
-
         if (roll < 60) {
-            // 0 contrainte
+            constraintCount = 0;
         } else if (roll < 95) {
-            // 1 contrainte
-            useFaction = random.nextBoolean();
-            useCost = !useFaction;
+            constraintCount = 1;
         } else {
-            // 2 contraintes (rare)
-            if (energyCost >= 5) {
-                useFaction = true;
-                useCost = true;
-            } else {
-                useFaction = random.nextBoolean();
-                useCost = !useFaction;
-            }
+            //constraintCount = (energyCost >= 5) ? 2 : 1;
+        	constraintCount = 2;
         }
-        if (useFaction) {
-            TargetConstraint faction =
-                factionConstraints.get(random.nextInt(factionConstraints.size()));
-            constraints.add(faction);
+        //constraintCount = 2;
+        if (targetsCard) {
+            pool1 = EffectConstraint.values().length == 0
+                ? List.of()
+                : Arrays.stream(EffectConstraint.values())
+                    .filter(c -> c.appliesToTarget()) // ou getTargetConstraints()
+                    .toList();
+        } else {
+            pool1 = Arrays.asList(EffectConstraint.values());
         }
-
-        if (useCost) {
-            TargetConstraint cost =
-                costConstraints.get(random.nextInt(costConstraints.size()));
-            constraints.add(cost);
+        
+        
+        EffectConstraint effet1;
+        if (constraintCount>0) {
+        	effet1 =	pool1.get(random.nextInt(pool1.size()));
+        	//effet1 = EffectConstraint.POSITION_MIDDLE;
+            constraints.add(effet1);
+            if (constraintCount==2) {
+           	 List<EffectConstraint> pool2 = pool1.stream()
+                        .filter(s -> s.getConstraintType()!=effet1.getConstraintType())
+                        .toList();
+           	EffectConstraint effet2 =	pool2.get(random.nextInt(pool2.size()));
+                   constraints.add(effet2);
+           }
         }
+        
         
         
 
@@ -282,22 +270,9 @@ public class CardEffect {
         
         
         sb.append(trigger.getShortDisplay(conditionKeyword)).append(" : ");
-        // Texte principal
-        String text = ability.buildText(value);
-
-        boolean targetsCard =
-                ability.requiresTarget()
-                && (targetType == TargetType.ALLY || targetType == TargetType.ENEMY);
-
-        if (constraints != null && !constraints.isEmpty()) {
-            if (targetsCard) {
-                text = applyTargetConstraints(text, constraints);
-            } else {
-                text += " si " + buildPossessionCondition(constraints);
-            }
-        }
-
-        sb.append(text);
+        
+        sb.append(getEffectText());
+        
         return sb.toString().trim();
     }
     /*
@@ -311,44 +286,50 @@ public class CardEffect {
         //sb.append("("+(int)Math.round(this.computeRawPower())+":"+this.getTrigger().getWeight()+"/"+this.getAbility().getWeight()+"/"+this.getValue()+"/"+this.getConstraints().size());
         
 
-        String text = ability.buildText(value);
-
+        
+        /*
         boolean targetsCard =
                 ability.requiresTarget()
                 && (targetType == TargetType.ALLY || targetType == TargetType.ENEMY);
-
-        if (constraints != null && !constraints.isEmpty()) {
-            if (targetsCard) {
-                text = applyTargetConstraints(text, constraints);
-            } else {
-                text += " si " + buildPossessionCondition(constraints);
-            }
+         */
+        List<EffectConstraint> targetConstraints = getTargetConstraints();
+        List<EffectConstraint> conditionConstraints = getConditionConstraints();
+        
+        String text = ability.buildText(value);
+        
+        //les contraintes qui ciblent les cartes sont a la suite du texte.
+        // les contraintes qui ne cible rien et dépenden d'autre chose se mettent au début.
+       
+        if (!conditionConstraints.isEmpty()) {
+            text = "Si " + buildPossessionCondition(conditionConstraints)+"," + text;
         }
+        
+
+        if (!targetConstraints.isEmpty() ) {
+            text = applyTargetConstraints(text, targetConstraints);
+        }
+
+        
 
         sb.append(text);
         return sb.toString().trim();
     }
-    private String applyTargetConstraints(String base, Set<TargetConstraint> constraints) {
+    private String applyTargetConstraints(String base, List<EffectConstraint> constraints) {
+        String adjectives = constraints.stream()
+            .map(EffectConstraint::getTargetAdjective)
+            .reduce((a, b) -> a + " " + b)
+            .orElse("");
 
-        StringBuilder sb = new StringBuilder(base);
-
-        sb.append(" ");
-
-        // ex: "à une unité ennemie"
-        // → enrichir avec adjectifs
-        for (TargetConstraint c : constraints) {
-            sb.append(c.getTargetAdjective()).append(" ");
-        }
-
-        return sb.toString().trim();
+        return (base + " " + adjectives).trim();
     }
-    private String buildPossessionCondition(Set<TargetConstraint> constraints) {
 
+    private String buildPossessionCondition(List<EffectConstraint> constraints) {
         return constraints.stream()
-                .map(c -> "vous avez " + c.getPossessionText())
-                .reduce((a, b) -> a + " et " + b)
-                .orElse("");
+            .map(c -> c.getPossessionText())
+            .reduce((a, b) -> a + " et " + b)
+            .orElse("");
     }
+
 
 
     
@@ -368,7 +349,7 @@ public class CardEffect {
         if (ability.isNegativeForOwner() && raw >0)raw=0; //protection contre un effet négatif qui couerait des stats
         
         double modifier = 100;//pour 100%
-        for (TargetConstraint c : getConstraints()) {
+        for (EffectConstraint c : getConstraints()) {
         	
             modifier += c.getPowerModifier(); // ex: -15
             if (ability.requiresTarget() && targetType == TargetType.ENEMY) {//cible une carte ennemy
@@ -403,5 +384,16 @@ public class CardEffect {
             constraintsPart
         );
     }
-    
+    private List<EffectConstraint> getTargetConstraints() {
+        return constraints.stream()
+            .filter(c -> c.getConstraintType().applyTarget()&&(this.getAbility().requiresTarget()))
+
+            .toList();
+    }
+
+    private List<EffectConstraint> getConditionConstraints() {
+        return constraints.stream()
+        		.filter(c -> !c.getConstraintType().applyTarget()||(!this.getAbility().requiresTarget()))
+            .toList();
+    }
 }

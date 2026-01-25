@@ -20,7 +20,8 @@ public class BalancedBoosterGenerator {
 	static ThreadLocalRandom random = ThreadLocalRandom.current();
 	
 	static boolean MAKE_IA_IMAGE=false;
-	static int nb_booster=1;
+	static boolean isDB=false;
+	static int nb_booster=10;
 	static int taille_booster =18;
 	
     public static void main(String[] args) throws Exception {
@@ -39,7 +40,14 @@ public class BalancedBoosterGenerator {
  
     	//Booster booster=new Booster18(random);
     	JdbcCardDao dao=new JdbcCardDao(DbUtil.getConnection());
-    	Booster18DB booster=new Booster18DB(random,dao);
+    	
+    	Booster booster=null;
+    	if (isDB) {
+    		booster=new Booster18DB(random,dao);
+        	
+    	}else {
+    		booster = new Booster18(random);
+    	}
     	booster.generate();
     	dao.close();
     	List<String> prompts=getPromptduBooster(booster);

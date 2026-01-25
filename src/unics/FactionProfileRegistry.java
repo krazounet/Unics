@@ -121,10 +121,7 @@ public final class FactionProfileRegistry {
                 Set.of(
                     Keyword.BOUCLIER
                 ),
-                Set.of(	TriggerType.ON_MOVE,
-                		TriggerType.POSITION_BACK,
-                		TriggerType.POSITION_FRONT,
-                		TriggerType.POSITION_MIDDLE),
+                Set.of(	TriggerType.ON_MOVE),
                 Set.of(),
                 Set.of(
                     AbilityType.MOVE_ALLY,
