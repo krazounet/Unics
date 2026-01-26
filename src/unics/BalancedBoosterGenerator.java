@@ -19,9 +19,9 @@ public class BalancedBoosterGenerator {
 
 	static ThreadLocalRandom random = ThreadLocalRandom.current();
 	
-	static boolean MAKE_IA_IMAGE=false;
+	static boolean MAKE_IA_IMAGE=true;
 	static boolean isDB=false;
-	static int nb_booster=10;
+	static int nb_booster=1;
 	static int taille_booster =18;
 	
     public static void main(String[] args) throws Exception {

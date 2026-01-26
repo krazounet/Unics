@@ -36,9 +36,14 @@ public enum EffectConstraint {
 	//───────── PRESENCE ─────────
 	ALLIED_UNIT_PRESENT	(ConstraintType.PRESENSE,"une autre unité en jeu",-10),
 	ENEMY_HAS_STRUCTURE	(ConstraintType.PRESENSE,"l'adversaire a une structure en jeu",-20),
-	NO_ENEMY_UNIT		(ConstraintType.PRESENSE,"l'adversaire n'a pas de carte en jeu",0);
+	NO_ENEMY_UNIT		(ConstraintType.PRESENSE,"l'adversaire n'a pas de carte en jeu",0),
+	
+	//───────── Taille de MAIN ─────────
 	
 	
+	HAND_EMPTY(ConstraintType.HAND,"si votre main est vide",-30),
+    HAND_SIZE_3_OR_LESS(ConstraintType.HAND,"si vous avez 3 cartes ou moins en main",-10);
+
 	
     private final String displayName;
     private final int powerModifier; // ⚠️ négatif
@@ -135,6 +140,10 @@ public enum EffectConstraint {
             		"l'adversaire n'a aucune carte en jeu";
             case ENEMY_HAS_STRUCTURE ->
             		"l'adversaire a une structure en jeu";
+            case HAND_EMPTY ->
+            		"votre main est vide";
+            case HAND_SIZE_3_OR_LESS ->
+            		"votre main a 3 cartes ou moins";
 
         };
     }

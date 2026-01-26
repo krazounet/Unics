@@ -1,6 +1,7 @@
 package unics.Enum;
 
 import java.util.EnumSet;
+import java.util.List;
 
 /**
  * Enum représentant le type d'effet d'une capacité.
@@ -267,92 +268,98 @@ public enum AbilityType {
             default -> false;
         };
     }
-    public String buildText(int value) {
-
+    public String buildText(int value, List<EffectConstraint> lec) {
+    	String faction="";
+    	String cost="";
+    	for (EffectConstraint ec : lec) {
+    		if (ec.getConstraintType()==ConstraintType.FACTION)faction=ec.getTargetAdjective();
+    		if (ec.getConstraintType()==ConstraintType.COUT)cost=ec.getTargetAdjective();
+    	}
         String x = value > 1 ? value + " " : value + " ";
-
-        return switch (this) {
+        String effect="";
+        switch (this) {
 
             // ──────────────── Défausse ────────────────
 
             case DISCARD_SELF ->
-                    "Défaussez " + x + "carte" + (value > 1 ? "s" : "");
+            effect="Défaussez " + x + "carte" + (value > 1 ? "s" : "");
 
             case DISCARD_ENEMY ->
-                    "L’adversaire défausse " + x + "carte" + (value > 1 ? "s" : "");
+            effect="L’adversaire défausse " + x + "carte" + (value > 1 ? "s" : "");
 
             // ──────────────── Dégâts / soins ────────────────
 
             case DAMAGE_UNIT_ENEMY ->
-                    "Inflige " + x + "dégâts à une unité ennemie";
+            effect="Inflige " + x + "dégâts à une unité "+faction+" ennemie "+cost;
 
             case DAMAGE_UNIT_ALLY ->
-                    "Inflige " + x + "dégâts à une unité alliée";
+            effect="Inflige " + x + "dégâts à une unité "+faction+" alliée "+cost;
 
             case DAMAGE_PC_SELF ->
-                    "Vous subissez " + x + "PC";
+            effect="Vous subissez " + x + "PC";
 
             case DAMAGE_PC_ENEMY ->
-                    "Inflige " + x + "PC à l'ennemi";
+            effect="Inflige " + x + "PC à l'ennemi";
 
             case HEAL_PC ->
-                    "Restaure " + x + "PC";
+            effect="Restaure " + x + "PC";
 
             // ──────────────── Stats ────────────────
 
             case BUFF ->
-                    "+"+value+"/+"+value+" à une unité alliée";
+            effect= "+"+value+"/+"+value+" à une unité "+faction+" alliée "+cost;
 
             case DEBUFF_ENEMY ->
-                    "-"+value+"/-"+value+" à une unité ennemie";
+            effect="-"+value+"/-"+value+" à une unité "+faction+" ennemie "+cost;
 
             case DEBUFF_ALLY ->
-            		"-"+value+"/-"+value+" à une unité alliée";
+            effect="-"+value+"/-"+value+" à une unité "+faction+" alliée "+cost;
 
             // ──────────────── Cartes ────────────────
 
             case DRAW ->
-                    "Piochez " + x + "carte" + (value > 1 ? "s" : "");
+            effect="Piochez " + x + "carte" + (value > 1 ? "s" : "");
 
             case DESTROY_UNIT_ENEMY ->
-                    "Détruit "+x+" unité"+ (value > 1 ? "s" : "")+ " ennemie";
+            effect="Détruit "+x+" unité"+ (value > 1 ? "s" : "")+" "+ faction+" ennemie "+cost;
 
             case DESTROY_STRUCTURE_ENEMY ->
-                    "Détruit "+x+" structure"+(value > 1 ? "s" : "")+ " ennemie";
+            effect="Détruit "+x+" structure"+(value > 1 ? "s" : "")+" "+faction+" ennemie "+cost;
 
             // ──────────────── Mouvement ────────────────
 
             case MOVE_ALLY ->
-                    "Déplace une unité alliée "+x+" fois";
+            effect="Déplace une unité "+faction+" alliée "+x+" fois "+cost;
 
             case MOVE_ENEMY ->
-                    "Déplace une unité ennemie "+x+" fois";
+            effect= "Déplace une unité "+faction+" ennemie "+x+" fois "+cost;
 
             // ──────────────── Énergie ────────────────
 
             case ENERGY_GAIN_SELF ->
-                    "+" + x + "énergie";
+            effect="+" + x + "énergie";
 
             case ENERGY_GAIN_ENEMY ->
-                    "L’adversaire gagne " + x + "énergie"+(value > 1 ? "s" : "");
+            effect="L’adversaire gagne " + x + "énergie"+(value > 1 ? "s" : "");
 
             case ENERGY_LOSS_SELF ->
-                    "-" + x + "énergie";
+            effect="-" + x + "énergie";
 
             case ENERGY_LOSS_ENEMY ->
-                    "L’adversaire perd " + x + "énergie"+(value > 1 ? "s" : "");
+            effect= "L’adversaire perd " + x + "énergie"+(value > 1 ? "s" : "");
                     
             case TAP_ALLY ->
-            	"Incline " + x + "unité"+(value > 1 ? "s" : "")+" alliée"+(value > 1 ? "s" : "");        
+            effect="Incline " + x + "unité"+(value > 1 ? "s" : "")+" "+ faction+" alliée"+(value > 1 ? "s" : "")+" "+cost;        
             case UNTAP_ALLY ->
-            "Redresse " + x + "unité"+(value > 1 ? "s" : "")+" alliée"+(value > 1 ? "s" : "");  
+            effect="Redresse " + x + "unité"+(value > 1 ? "s" : "")+" "+ faction+" alliée"+(value > 1 ? "s" : "")+" "+cost;  
             case TAP_ENEMY ->
-           	"Incline " + x + "unité"+(value > 1 ? "s" : "")+" ennemie"+(value > 1 ? "s" : ""); 
+            effect="Incline " + x + "unité"+(value > 1 ? "s" : "")+" "+ faction+" ennemie"+(value > 1 ? "s" : "")+" "+cost; 
             case UNTAP_ENEMY ->
-            "Redresse " + x + "unité"+(value > 1 ? "s" : "")+" ennemie"+(value > 1 ? "s" : "");  
+            effect="Redresse " + x + "unité"+(value > 1 ? "s" : "")+" "+ faction+" ennemie"+(value > 1 ? "s" : "")+" "+cost;  
             case RETURN_TO_HAND ->
-            "La carte ciblée retourne en main";
+            effect="La carte "+ faction+" ciblée "+cost+" retourne en main";
         };
+        return effect;
     }
 
     @Override

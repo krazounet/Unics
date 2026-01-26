@@ -13,8 +13,8 @@ import unics.Enum.Faction;
 public class ExecCardSpaceAnalysis {
 
 	public static void main(String[] args) {
-		final int TARGET = 5_000_000;
-		final int STEP = 20_000;
+		final int TARGET = 1_000_000;
+		final int STEP = 10_000;
 
 		Map<String, Card> uniques = new HashMap<>(TARGET * 2);
 

@@ -4,6 +4,12 @@ import java.util.EnumSet;
 import java.util.Set;
 
 public enum TriggerType {
+	ON_ALLIED_UNIT_ENTERS(
+		    "Quand une carte alliée arrive en jeu",
+		    "La capacité se déclenche lorsqu’une autre unité alliée arrive en jeu",
+		    0,
+		    EnumSet.of(CardType.UNIT,CardType.STRUCTURE)
+		),
 
     ON_PLAY(
         "À la pose",
@@ -22,7 +28,7 @@ public enum TriggerType {
     ON_TURN_START(
         "Au début du tour",
         "La capacité se déclenche au début du tour du joueur",
-        -5,
+        0,
         EnumSet.of(CardType.UNIT, CardType.STRUCTURE)
     ),
 

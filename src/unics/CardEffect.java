@@ -31,7 +31,7 @@ public class CardEffect {
     
     private final Set<EffectConstraint> constraints;
     
-    private static int MODIFIER_CONTRAINTE_NEGATIVE = -30; //exprimé en %, arbitraire pour le moment
+    //private static int MODIFIER_CONTRAINTE_NEGATIVE = -30; //exprimé en %, arbitraire pour le moment
     
     public Set<EffectConstraint> getConstraints() {
 		return constraints;
@@ -295,25 +295,28 @@ public class CardEffect {
         List<EffectConstraint> targetConstraints = getTargetConstraints();
         List<EffectConstraint> conditionConstraints = getConditionConstraints();
         
-        String text = ability.buildText(value);
+        String text = ability.buildText(value,targetConstraints);
         
         //les contraintes qui ciblent les cartes sont a la suite du texte.
         // les contraintes qui ne cible rien et dépenden d'autre chose se mettent au début.
-       
+       /*
+        if (!targetConstraints.isEmpty() ) {
+            text = applyTargetConstraints(text, targetConstraints);
+        }
+*/
+        
         if (!conditionConstraints.isEmpty()) {
             text = "Si " + buildPossessionCondition(conditionConstraints)+"," + text;
         }
         
 
-        if (!targetConstraints.isEmpty() ) {
-            text = applyTargetConstraints(text, targetConstraints);
-        }
-
+        
         
 
         sb.append(text);
         return sb.toString().trim();
     }
+    /*
     private String applyTargetConstraints(String base, List<EffectConstraint> constraints) {
         String adjectives = constraints.stream()
             .map(EffectConstraint::getTargetAdjective)
@@ -322,6 +325,7 @@ public class CardEffect {
 
         return (base + " " + adjectives).trim();
     }
+    */
 
     private String buildPossessionCondition(List<EffectConstraint> constraints) {
         return constraints.stream()
@@ -350,12 +354,16 @@ public class CardEffect {
         
         double modifier = 100;//pour 100%
         for (EffectConstraint c : getConstraints()) {
-        	
+        	int constraint_modifier=c.getPowerModifier();
+        	if (ability.requiresTarget() && c.appliesToTarget()) {constraint_modifier=constraint_modifier*2;}
+        	modifier +=constraint_modifier;
+        	/*
             modifier += c.getPowerModifier(); // ex: -15
             if (ability.requiresTarget() && targetType == TargetType.ENEMY) {//cible une carte ennemy
             	modifier+=MODIFIER_CONTRAINTE_NEGATIVE;//valeur arbitraire temporaire
             }
             if (ability.isNegativeForOwner()) modifier+=MODIFIER_CONTRAINTE_NEGATIVE;//valeur arbitraire temporaire
+            */
         }
         modifier =modifier/100;
         
