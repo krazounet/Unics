@@ -4,8 +4,9 @@ import java.time.Instant;
 import java.util.UUID;
 
 import aiGenerated.CardRender;
+import aiGenerated.RenderProfile;
 
-public interface CardRenderDao {
+public interface CardRenderDaoInterface {
 
     void insert(CardRender render);
 
@@ -22,4 +23,6 @@ public interface CardRenderDao {
     );
 
     CardRender findById(UUID renderId);
+
+	CardRender findByVisualSignature(String visualSignature, RenderProfile profile);
 }

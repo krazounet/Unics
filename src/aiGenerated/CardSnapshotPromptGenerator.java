@@ -24,9 +24,9 @@ public final class CardSnapshotPromptGenerator {
 
     public String generatePrompt() {
         StringBuilder prompt = new StringBuilder();
-
+       // prompt.append("single figure occupying at least 80% of the image width, asymmetrical composition,");
         // Intention visuelle figée (snapshot)
-        prompt.append(snapshot.illustrationPromptBase).append(", ");
+        //prompt.append(snapshot.illustrationPromptBase).append(", ");
 
         appendCardType(prompt);
         appendFactionStyle(prompt);
@@ -36,7 +36,7 @@ public final class CardSnapshotPromptGenerator {
         appendGlobalStyle(prompt);
         // Style & contraintes IA (RenderProfile)
         prompt.append(profile.stylePrompt).append(", ");
-        prompt.append(profile.negativePrompt);
+       // prompt.append(profile.negativePrompt);
 
         return prompt.toString().trim();
     }
@@ -88,9 +88,18 @@ public final class CardSnapshotPromptGenerator {
 
     private void appendCardType(StringBuilder sb) {
         switch (snapshot.type) {
-            case UNIT -> sb.append("full body character concept art, ");
-            case STRUCTURE -> sb.append("massive structure or fortress, ");
-            case ACTION -> sb.append("dynamic magical or technological effect, no character visible, ");
+            case UNIT -> sb.append("single humanoid character occupying at least 80% of the image width,"
+            		+ "full body,"
+            		+ "centered composition,"
+            		+ "front view,"
+            		+ "fantasy trading card illustration,"
+            		+ "high detail,"
+            		+ "dramatic lighting,"
+            		+ "clean background,"
+            		+ "subject fills the frame"
+            		+ " ");
+            case STRUCTURE -> sb.append("single structure occupying at least 80% of the image width, centered, no characters, ");
+            case ACTION -> sb.append("single visual effect, no characters visible, ");
 		default -> throw new IllegalArgumentException("Unexpected value: " + snapshot.type);
         }
     }
@@ -109,7 +118,9 @@ public final class CardSnapshotPromptGenerator {
     		    "artwork illustration only, full bleed artwork, " +
     		    "clean background, centered subject, " +
     		    "no frame, no borders, no UI elements, " +
-    		    "no text, no watermark, no logo"
+    		    "no text, no watermark, no logo"+
+    		    "single character, one subject only, solo, "+
+    		    "trading card illustration, card art, subject fills the frame, "
     		);
 
     }

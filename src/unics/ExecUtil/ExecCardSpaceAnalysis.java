@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
+import aiGenerated.VisualIdentity;
 import unics.Card;
 import unics.CardGenerator;
 import unics.CardIdentity;
@@ -17,6 +18,7 @@ public class ExecCardSpaceAnalysis {
 		final int STEP = 10_000;
 
 		Map<String, Card> uniques = new HashMap<>(TARGET * 2);
+		Map<String, Card> visualIdentityCounts = new HashMap<>();
 
 		long generated = 0;
 		long collisions = 0;
@@ -69,8 +71,13 @@ public class ExecCardSpaceAnalysis {
 		        lastUnique = uniques.size();
 		    }
 		}
-
-
+		// j'ai atteint la cible. combien sont uniques visuellement
+		for (Card card : uniques.values()) {
+		    // traitement sur la Card
+			VisualIdentity vid= new VisualIdentity(card.freeze());
+			visualIdentityCounts.putIfAbsent(vid.computeSignatureHash(), card);
+		}
+		System.out.println("sur "+TARGET+" cartes générées, "+visualIdentityCounts.size()+" sont uniques");
 	}
 	static String identityKey(Card c) {
 	    return c.getIdentity().toString()

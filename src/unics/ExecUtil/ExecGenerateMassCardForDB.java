@@ -1,6 +1,8 @@
 package unics.ExecUtil;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 import dbPG18.DbUtil;
@@ -13,8 +15,10 @@ import unics.Enum.Faction;
 public class ExecGenerateMassCardForDB {
 
     static final int NB_ESSAI_CARTE = 50;
-    static final int TOTAL = 10000;
-
+    static final int TOTAL = 1000000;
+    static Map<String, Integer> visualIdentityCount = new HashMap<>();
+    
+    
     public static void main(String[] args) {
 
         long start = System.currentTimeMillis();
@@ -52,6 +56,9 @@ public class ExecGenerateMassCardForDB {
                     );
                 }
             }
+            System.out.println("FIN DE CREATION DE "+TOTAL+" CARTES");
+            
+            
 
         } catch (SQLException e) {
 			// TODO Auto-generated catch block

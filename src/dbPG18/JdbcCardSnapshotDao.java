@@ -15,7 +15,7 @@ import unics.snapshot.CardSnapshot;
 import unics.snapshot.EffectSnapshot;
 import unics.Enum.*;
 
-public class JdbcCardSnapshotDao implements CardSnapshotDao {
+public class JdbcCardSnapshotDao implements CardSnapshotDaoInterface {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -26,64 +26,67 @@ public class JdbcCardSnapshotDao implements CardSnapshotDao {
     @Override
     public void insert(CardSnapshot s) {
 
-        String sql = """
-            INSERT INTO card_snapshot (
-                id,
-                card_id,
-                public_id,
-                signature,
+    	String sql = """
+    		    INSERT INTO card_snapshot (
+    		        id,
+    		        card_id,
+    		        public_id,
+    		        signature,
+    		        visual_signature,
+    		        snapshot_version,
 
-                card_type,
-                faction,
-                cost,
-                attack,
-                health,
+    		        card_type,
+    		        faction,
+    		        cost,
+    		        attack,
+    		        health,
+    		        keywords,
+    		        effects,
 
-                keywords,
-                effects,
+    		        name,
+    		        rules_text,
+    		        flavor_text,
 
-                name,
-                rules_text,
-                flavor_text,
+    		        illustration_prompt_base,
+    		        frame_id,
 
-                illustration_prompt_base,
-                frame_id,
-
-                generated_at,
-                generator_version,
-                schema_version
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    		        generated_at,
+    		        generator_version,
+    		        schema_version
+    		    )
+    		    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT (signature) DO NOTHING
         """;
 
         try (Connection c = DbUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
 
-            ps.setObject(1, s.snapshotId);          // snapshot id                     !!!!! A CHANGER
-            ps.setObject(2, s.cardId);          // FK card_id (voir note plus bas) !!!!! A CHANGER
+            ps.setObject(1, s.snapshotId);
+            ps.setObject(2, s.cardId);
             ps.setString(3, s.publicId);
             ps.setString(4, s.signature);
+            ps.setString(5, s.visualSignature);
+            ps.setInt(6, s.snapshotVersion);
 
-            ps.setString(5, s.type.name());
-            ps.setString(6, s.faction.name());
-            ps.setInt(7, s.cost);
-            ps.setObject(8, s.attack);
-            ps.setObject(9, s.health);
+            ps.setString(7, s.type.name());
+            ps.setString(8, s.faction.name());
+            ps.setInt(9, s.cost);
+            ps.setInt(10, s.attack);
+            ps.setInt(11, s.health);
+            ps.setString(12, toJson(s.keywords));
+            ps.setString(13, toJson(s.effects));
 
-            ps.setString(10, toJson(s.keywords));
-            ps.setString(11, toJson(s.effects));
+            ps.setString(14, s.name);
+            ps.setString(15, s.rulesText);
+            ps.setString(16, s.flavorText);
 
-            ps.setString(12, s.name);
-            ps.setString(13, s.rulesText);
-            ps.setString(14, s.flavorText);
+            ps.setString(17, s.illustrationPromptBase);
+            ps.setString(18, s.frameId);
 
-            ps.setString(15, s.illustrationPromptBase);
-            ps.setString(16, s.frameId);
+            ps.setTimestamp(19, Timestamp.from(s.generatedAt));
+            ps.setString(20, s.generatorVersion);
+            ps.setInt(21, s.schemaVersion);
 
-            ps.setTimestamp(17, Timestamp.from(s.generatedAt));
-            ps.setString(18, s.generatorVersion);
-            ps.setInt(19, s.schemaVersion);
 
             ps.executeUpdate();
             System.out.println("INSERT SNAPSHOT → " + s.snapshotId);
@@ -152,11 +155,12 @@ public class JdbcCardSnapshotDao implements CardSnapshotDao {
 
         try {
             return new CardSnapshot(
-            		UUID.fromString(rs.getString("id")),        // snapshotId
-            	    UUID.fromString(rs.getString("card_id")),   // cardId
+                UUID.fromString(rs.getString("id")),        // snapshotId
+                UUID.fromString(rs.getString("card_id")),   // cardId
                 rs.getString("public_id"),
                 rs.getString("signature"),
-                rs.getInt("schema_version"),
+                rs.getString("visual_signature"),           // ✅ AJOUT
+                rs.getInt("snapshot_version"),              // ✅ AJOUT
 
                 CardType.valueOf(rs.getString("card_type")),
                 Faction.valueOf(rs.getString("faction")),
@@ -164,10 +168,14 @@ public class JdbcCardSnapshotDao implements CardSnapshotDao {
                 rs.getInt("attack"),
                 rs.getInt("health"),
 
-                fromJson(rs.getString("keywords"),
-                    new TypeReference<List<Keyword>>() {}),
-                fromJson(rs.getString("effects"),
-                    new TypeReference<List<EffectSnapshot>>() {}),
+                fromJson(
+                    rs.getString("keywords"),
+                    new TypeReference<List<Keyword>>() {}
+                ),
+                fromJson(
+                    rs.getString("effects"),
+                    new TypeReference<List<EffectSnapshot>>() {}
+                ),
 
                 rs.getString("name"),
                 rs.getString("rules_text"),
@@ -185,6 +193,7 @@ public class JdbcCardSnapshotDao implements CardSnapshotDao {
             throw new SQLException("map CardSnapshot failed", e);
         }
     }
+
 
     // ─────────────────────────────────────────────
     // JSON HELPERS

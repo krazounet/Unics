@@ -9,7 +9,7 @@ public final class CardRender {
 
     // ===== IDENTITE =====
     public final UUID renderId;
-    public final UUID cardSnapshotId;
+    public final String visual_signature ;
 
     // ===== PROFIL =====
     public final RenderProfile renderProfile;
@@ -32,7 +32,7 @@ public final class CardRender {
 
     public CardRender(
         UUID renderId,
-        UUID cardSnapshotId,
+        String visualSignature,
         RenderProfile renderProfile,
         String prompt,
         String negativePrompt,
@@ -44,7 +44,7 @@ public final class CardRender {
         Instant renderedAt
     ) {
         this.renderId = renderId;
-        this.cardSnapshotId = cardSnapshotId;
+        this.visual_signature = visualSignature;
         this.renderProfile = renderProfile;
         this.prompt = prompt;
         this.negativePrompt = negativePrompt;

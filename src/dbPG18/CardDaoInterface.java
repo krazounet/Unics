@@ -5,7 +5,7 @@ import unics.CardIdentity;
 
 import java.util.Optional;
 
-public interface CardDao {
+public interface CardDaoInterface {
 
     Optional<Card> findByIdentity(CardIdentity identity);
 

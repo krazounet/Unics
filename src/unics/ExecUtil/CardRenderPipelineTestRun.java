@@ -22,7 +22,7 @@ public final class CardRenderPipelineTestRun {
 
             try {
                 CardDbRow row =
-                    cardDao.findRowByPublicId("5X8C6W");
+                    cardDao.findRowByPublicId("AZNR4V");
 
                 if (row == null) {
                     System.err.println("❌ Carte non trouvée");
@@ -41,10 +41,10 @@ public final class CardRenderPipelineTestRun {
             // 2️⃣ Initialiser le pipeline
             // ─────────────────────────────────────────────
 
-            CardSnapshotDao snapshotDao =
+            CardSnapshotDaoInterface snapshotDao =
                 new JdbcCardSnapshotDao();
 
-            CardRenderDao renderDao =
+            CardRenderDaoInterface renderDao =
                 new JdbcCardRenderDao();
 
             ComfyUIClient client =
@@ -53,7 +53,7 @@ public final class CardRenderPipelineTestRun {
             ComfyUIWorker worker =
                 new ComfyUIWorker(
                     client,
-                    Path.of("images/test")
+                    Path.of("images")
                 );
 
             CardRenderPipeline pipeline =

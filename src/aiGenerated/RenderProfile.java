@@ -10,9 +10,32 @@ public enum RenderProfile {
       + "digital painting, sharp focus",
 
         // 🚫 Négatifs STRICTS
-        "no text, no typography, no letters, no watermark, no logo, "
-      + "no UI, no frame, no borders, no card layout, no mockup, "
-      + "no screenshot, no photograph, no real people, no low quality",
+        "multiple characters,  "
+        + "group,  "
+        + "crowd,  "
+        + "duplicates,  "
+        + "clones,  "
+        + "same character twice,  "
+        + "character sheet,  "
+        + "turnaround,  "
+        + "lineup,  "
+        + "reference sheet,  "
+        + "concept art,  "
+        + "poses,  "
+        + "sketch,  "
+        + "draft,  "
+        + "low quality,  "
+        + "blurry,  "
+        + "cropped,  "
+        + "out of frame,  "
+        + "text,  "
+        + "logo,  "
+        + "watermark,  "
+        + "ui,  "
+        + "frame,  "
+        + "border  "
+        
+      + "",
 
         // 🤖 Workflow / modèle
         "comfyui-fantasy-v1",
@@ -21,7 +44,7 @@ public enum RenderProfile {
         "1:1",
 
         // 🔢 Paramètres techniques
-        10,   // steps !! repasser à 30
+        16,   // steps !! repasser à 30
         6   // cfgScale !! repasser à 7,5
     );
 

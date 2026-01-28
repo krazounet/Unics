@@ -1,10 +1,6 @@
 package dbPG18;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -12,10 +8,10 @@ import aiGenerated.CardRender;
 import aiGenerated.RenderProfile;
 import aiGenerated.RenderStatus;
 
-public class JdbcCardRenderDao implements CardRenderDao {
+public class JdbcCardRenderDao implements CardRenderDaoInterface {
 
     // ─────────────────────────────────────────────
-    // INSERT
+    // INSERT (idempotent via UNIQUE constraint)
     // ─────────────────────────────────────────────
 
     @Override
@@ -24,11 +20,11 @@ public class JdbcCardRenderDao implements CardRenderDao {
         String sql = """
             INSERT INTO card_render (
                 render_id,
-                snapshot_id,
+                visual_signature,
+                render_profile,
                 status,
                 image_path,
                 seed,
-                render_profile,
                 workflow_id,
                 created_at
             )
@@ -39,21 +35,58 @@ public class JdbcCardRenderDao implements CardRenderDao {
              PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setObject(1, r.renderId);
-            ps.setObject(2, r.cardSnapshotId);
+            ps.setString(2, r.visual_signature);
+            ps.setString(3, r.renderProfile.name());
 
-            ps.setString(3, r.status.name());
-            ps.setString(4, r.imagePath);
+            ps.setString(4, r.status.name());
+            ps.setString(5, r.imagePath);
 
-            ps.setLong(5, r.seed);
-            ps.setString(6, r.renderProfile.name());
+            ps.setLong(6, r.seed);
             ps.setString(7, r.workflowId);
-
             ps.setTimestamp(8, Timestamp.from(r.createdAt));
 
             ps.executeUpdate();
-            System.out.println("INSERT RENDER → " + r.renderId);
+
+            System.out.println("INSERT RENDER → " + r.visual_signature);
+
         } catch (SQLException e) {
             throw new RuntimeException("insert CardRender failed", e);
+        }
+    }
+
+    // ─────────────────────────────────────────────
+    // FIND BY VISUAL SIGNATURE
+    // ─────────────────────────────────────────────
+
+    @Override
+    public CardRender findByVisualSignature(
+        String visualSignature,
+        RenderProfile profile
+    ) {
+
+        String sql = """
+            SELECT *
+            FROM card_render
+            WHERE visual_signature = ?
+              AND render_profile = ?
+        """;
+
+        try (Connection c = DbUtil.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setString(1, visualSignature);
+            ps.setString(2, profile.name());
+
+            ResultSet rs = ps.executeQuery();
+
+            if (!rs.next()) {
+                return null;
+            }
+
+            return map(rs);
+
+        } catch (SQLException e) {
+            throw new RuntimeException("findByVisualSignature failed", e);
         }
     }
 
@@ -149,28 +182,36 @@ public class JdbcCardRenderDao implements CardRenderDao {
                 return null;
             }
 
-            return new CardRender(
-                UUID.fromString(rs.getString("render_id")),
-                UUID.fromString(rs.getString("snapshot_id")),
-                RenderProfile.valueOf(rs.getString("render_profile")), // ✅ on sotcke en base le string et on en récupere l'Enum
-
-                null, // prompt (pas nécessaire ici)
-                null, // negativePrompt
-                rs.getLong("seed"),
-                rs.getString("workflow_id"),
-
-                rs.getString("image_path"),
-                RenderStatus.valueOf(rs.getString("status")),
-
-                rs.getTimestamp("created_at").toInstant(),
-                rs.getTimestamp("finished_at") != null
-                    ? rs.getTimestamp("finished_at").toInstant()
-                    : null
-            );
+            return map(rs);
 
         } catch (SQLException e) {
             throw new RuntimeException("findById failed", e);
         }
     }
-}
 
+    // ─────────────────────────────────────────────
+    // MAPPER
+    // ─────────────────────────────────────────────
+
+    private CardRender map(ResultSet rs) throws SQLException {
+
+        return new CardRender(
+            UUID.fromString(rs.getString("render_id")),
+            rs.getString("visual_signature"),
+            RenderProfile.valueOf(rs.getString("render_profile")),
+
+            null, // prompt (inutile ici)
+            null, // negativePrompt
+            rs.getLong("seed"),
+            rs.getString("workflow_id"),
+
+            rs.getString("image_path"),
+            RenderStatus.valueOf(rs.getString("status")),
+
+            rs.getTimestamp("created_at").toInstant(),
+            rs.getTimestamp("finished_at") != null
+                ? rs.getTimestamp("finished_at").toInstant()
+                : null
+        );
+    }
+}

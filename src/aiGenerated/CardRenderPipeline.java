@@ -1,21 +1,22 @@
 package aiGenerated;
 
+import java.nio.file.Path;
 import java.time.Instant;
 
-import dbPG18.CardRenderDao;
-import dbPG18.CardSnapshotDao;
+import dbPG18.CardRenderDaoInterface;
+import dbPG18.CardSnapshotDaoInterface;
 import unics.Card;
 import unics.snapshot.CardSnapshot;
 
 public class CardRenderPipeline {
 
-    private final CardSnapshotDao snapshotDao;
-    private final CardRenderDao renderDao;
+    private final CardSnapshotDaoInterface snapshotDao;
+    private final CardRenderDaoInterface renderDao;
     private final ComfyUIWorker worker;
 
     public CardRenderPipeline(
-        CardSnapshotDao snapshotDao,
-        CardRenderDao renderDao,
+        CardSnapshotDaoInterface snapshotDao,
+        CardRenderDaoInterface renderDao,
         ComfyUIWorker worker
     ) {
         this.snapshotDao = snapshotDao;
@@ -31,7 +32,22 @@ public class CardRenderPipeline {
 
         // 1️⃣ Freeze (création en mémoire)
         CardSnapshot frozen = card.freeze();
+        
+        //visual identity
+        String visualSig = new VisualIdentity(frozen).computeSignatureHash(); 
+        
+        // 2️⃣ CACHE VISUEL (clé du système)
+        CardRender existing =
+            renderDao.findByVisualSignature(
+                visualSig,
+                RenderProfile.DEFAULT
+            );
 
+        if (existing != null && existing.status == RenderStatus.DONE) {
+            System.out.println("🎯 VISUAL HIT → reuse image");
+            return existing;
+        }
+        
         // 2️⃣ Tentative d’insertion (idempotente grâce à UNIQUE(signature))
         snapshotDao.insert(frozen);
 
@@ -72,5 +88,18 @@ public class CardRenderPipeline {
 
         return result;
     }
+    public Path resolveImage(Card card) {
+
+        CardRender render = renderCard(card);
+
+        if (render.status != RenderStatus.DONE) {
+            throw new IllegalStateException(
+                "Render failed for card " + card.getName()
+            );
+        }
+
+        return Path.of(render.imagePath);
+    }
+
 
 }

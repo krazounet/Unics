@@ -27,7 +27,14 @@ public final class ComfyUIWorker {
             // 1️⃣ Construire le payload
             String payload =
                 ComfyUIWorkflowBuilder.buildPayload(render);
-
+            System.out.println(
+            	    "\n================ PROMPT =================\n" +
+            	    
+            	    render.prompt +
+            	    "\n-------------- NEGATIVE -----------------\n" +
+            	    render.negativePrompt +
+            	    "\n=========================================\n"
+            	);
             // 2️⃣ Envoyer à ComfyUI
             String response =
                 client.sendPrompt(payload);
@@ -43,7 +50,7 @@ public final class ComfyUIWorker {
             // 5️⃣ Retourner un render DONE
             return new CardRender(
                 render.renderId,
-                render.cardSnapshotId,
+                render.visual_signature,
                 render.renderProfile,
 
                 render.prompt,
@@ -65,7 +72,7 @@ public final class ComfyUIWorker {
             // 6️⃣ En cas d’erreur → FAILED
             return new CardRender(
                 render.renderId,
-                render.cardSnapshotId,
+                render.visual_signature,
                 render.renderProfile,
 
                 render.prompt,
@@ -116,13 +123,15 @@ public final class ComfyUIWorker {
             );
         }
 
+        // 📁 images/{renderProfile}/
         Path dir =
-            imageRoot.resolve(render.cardSnapshotId.toString());
+            imageRoot.resolve(render.renderProfile.name());
 
         Files.createDirectories(dir);
 
+        // 🖼️ {visualSignature}.png
         Path target =
-            dir.resolve(render.renderId + ".png");
+            dir.resolve(render.visual_signature + ".png");
 
         Files.copy(
             source,

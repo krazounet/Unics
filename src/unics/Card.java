@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import aiGenerated.VisualIdentity;
 import unics.Enum.CardType;
 import unics.Enum.Faction;
 import unics.Enum.Keyword;
@@ -107,7 +108,14 @@ public final class Card {
 
         // 3️⃣ Signature (source = CardIdentity)
         String signature = identity.buildSignature();
-
+        
+        //4 visualSignature
+        String visualsignature=new VisualIdentity(cardType, faction, keywords != null
+                ? keywords.stream().map(Enum::name).toList()
+                : List.of(), effects.stream()
+                .map(effect -> effect.getAbility().name())
+                .toList()).computeSignatureHash();
+        
         // 4️⃣ PublicId (stable, exposable)
         String snapshotPublicId = publicId != null
             ? publicId
@@ -118,6 +126,7 @@ public final class Card {
         	    id, //id de la Carte
         	    snapshotPublicId,
         	    signature,
+        	    visualsignature,
         	    SnapshotVersion.CURRENT,
 
         	    cardType,

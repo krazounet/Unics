@@ -13,6 +13,7 @@ public final class CardSnapshot {
     public final UUID cardId;       // 🆔 ID de la card métier
     public final String publicId;
     public final String signature;
+    public final String visualSignature;
     public final int snapshotVersion;
 
     // ===== GAMEPLAY =====
@@ -43,6 +44,7 @@ public final class CardSnapshot {
         UUID cardId,
         String publicId,
         String signature,
+        String visualSignature,
         int snapshotVersion,
 
         CardType type,
@@ -68,6 +70,7 @@ public final class CardSnapshot {
         this.cardId = cardId;
         this.publicId = publicId;
         this.signature = signature;
+        this.visualSignature=visualSignature;
         this.snapshotVersion = snapshotVersion;
         this.type = type;
         this.faction = faction;

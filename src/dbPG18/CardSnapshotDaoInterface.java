@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import unics.snapshot.CardSnapshot;
 
-public interface CardSnapshotDao {
+public interface CardSnapshotDaoInterface {
 
     void insert(CardSnapshot snapshot);
 

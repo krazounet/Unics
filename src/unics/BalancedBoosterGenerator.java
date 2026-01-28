@@ -11,18 +11,27 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import aiGenerated.ComfyUIBatchGenerator;
+import aiGenerated.CardRenderPipeline;
+import aiGenerated.ComfyUIClient;
+import aiGenerated.ComfyUIWorker;
+import dbPG18.CardRenderDaoInterface;
+import dbPG18.CardSnapshotDaoInterface;
 import dbPG18.DbUtil;
 import dbPG18.JdbcCardDao;
+import dbPG18.JdbcCardRenderDao;
+import dbPG18.JdbcCardSnapshotDao;
 
 public class BalancedBoosterGenerator {
 
 	static ThreadLocalRandom random = ThreadLocalRandom.current();
 	
 	static boolean MAKE_IA_IMAGE=true;
-	static boolean isDB=false;
+	static boolean isDB=true;
 	static int nb_booster=1;
 	static int taille_booster =18;
+	
+	private static CardRenderPipeline pipeline;
+
 	
     public static void main(String[] args) throws Exception {
     	
@@ -50,21 +59,20 @@ public class BalancedBoosterGenerator {
     	}
     	booster.generate();
     	dao.close();
-    	List<String> prompts=getPromptduBooster(booster);
-    	List<Path> lp;
-    	
-    	if (MAKE_IA_IMAGE)  lp =ComfyUIBatchGenerator.generateImages(prompts);
-    	else 				lp=getDefaultListPath();
+    	CardRenderPipeline pipeline = getPipeline();
+
+    	List<Path> lp = new ArrayList<>();
+
+    	for (Card card : booster.getCards()) {
+    		System.out.println("publicid : "+card.getPublicId());
+    	    Path imagePath = pipeline.resolveImage(card);
+    	    lp.add(imagePath);
+    	}
     	
         // Export PDF
         BoosterPdfExporterStyled.exportBoosterToPdf(booster, pdfFileName+booster.getPublicId()+"-"+booster.cards.size()+"-"+booster.getManaCurveProfile()+".pdf",lp);
     }
-    /*
-    public static List<Path> getDefaultListPath(){
-    	List<Path> lp=new ArrayList<Path>();
-    	for (int i=0;i<12;i++) {lp.add(Path.of("C:\\ai\\ComfyUI_windows_portable\\ComfyUI\\output\\default"+i+".png"));}
-    	return lp;
-    }*/
+ 
     public static List<Path> getDefaultListPath() {
         Path outputDir = Paths.get("C:\\ai\\ComfyUI_windows_portable\\ComfyUI\\output");
 
@@ -101,7 +109,33 @@ public class BalancedBoosterGenerator {
     	
     }
 
-    
+    private static CardRenderPipeline getPipeline() {
+
+        if (pipeline != null) {
+            return pipeline;
+        }
+
+        CardSnapshotDaoInterface snapshotDao =
+            new JdbcCardSnapshotDao();
+
+        CardRenderDaoInterface renderDao =
+            new JdbcCardRenderDao();
+
+        ComfyUIClient client =
+            new ComfyUIClient("http://localhost:8188");
+
+        ComfyUIWorker worker =
+            new ComfyUIWorker(client, Path.of("images"));
+
+        pipeline = new CardRenderPipeline(
+            snapshotDao,
+            renderDao,
+            worker
+        );
+
+        return pipeline;
+    }
+
 
     
 }

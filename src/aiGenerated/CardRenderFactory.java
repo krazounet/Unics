@@ -3,6 +3,7 @@ package aiGenerated;
 
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -33,11 +34,23 @@ public final class CardRenderFactory {
 
         // 2️⃣ Seed reproductible (mais aléatoire par défaut)
         long seed = generateSeed();
-
+        
+        List<String> keywords = snapshot.keywords.stream()
+                .map(effect -> effect.name())
+                .toList();
+        
+        
+        List<String> abilityTypes = snapshot.effects.stream()
+                .map(effect -> effect.ability.name())
+                .toList();
+        
+        //visual
+        String visualsignature=new VisualIdentity(snapshot.type, snapshot.faction, keywords, abilityTypes).computeSignatureHash();
+        
         // 3️⃣ Création du render PENDING
         return new CardRender(
             UUID.randomUUID(),           // renderId
-            snapshot.snapshotId,             // lien snapshot
+            visualsignature,             // VisualIdentity.buildsignature
             profile,                     // profil de rendu
 
             prompt,

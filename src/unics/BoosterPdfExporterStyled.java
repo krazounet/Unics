@@ -156,25 +156,34 @@ public class BoosterPdfExporterStyled {
                 innerFrame.add(header);
 
                 /* ───── ILLUSTRATION ───── */
+                
                 Div illustrationBox = new Div()
-                        .setHeight(ILLUSTRATION_HEIGHT)
-                        .setBorder(new SolidBorder(0.5f));
+                	    .setWidth(UnitValue.createPercentValue(100))
+                	    .setHeight(ILLUSTRATION_HEIGHT)
+                	    .setBorder(new SolidBorder(0.5f));
 
-                if (index < imagePaths.size() && imagePaths.get(index) != null) {
-                    ImageData imgData = loadOptimizedImage(
-                            imagePaths.get(index).toAbsolutePath().toString(),
-                            900,
-                            500,
-                            0.8f);
+                	
 
-                    Image img = new Image(imgData);
-                    img.setWidth(UnitValue.createPercentValue(100));
-                    img.setHeight(UnitValue.createPercentValue(100));
-                    img.setProperty(Property.OBJECT_FIT, ObjectFit.COVER);
-                    illustrationBox.add(img);
-                }
+                	// On force le remplissage EXACT
+                	ImageData imgData = loadCompressedImage(
+                		    imagePaths.get(index).toString(),
+                		    0.8f
+                		);
 
-                innerFrame.add(illustrationBox);
+                		Image img = new Image(imgData);
+                		img.setWidth(UnitValue.createPercentValue(100));
+                		img.setHeight(UnitValue.createPercentValue(100));
+                		img.setProperty(Property.OBJECT_FIT, ObjectFit.COVER);
+                		/*
+                 Image img = new Image(ImageDataFactory.create(imagePaths.get(index).toString()));
+                	img.setWidth(UnitValue.createPercentValue(100));
+                	img.setHeight(UnitValue.createPercentValue(100));
+						*/
+                	illustrationBox.add(img);
+                	innerFrame.add(illustrationBox);
+
+
+
 
                 /* ───── RULES + FOOTER (TABLE VERTICALE) ───── */
                 float RULES_ZONE_HEIGHT =
@@ -527,6 +536,26 @@ public class BoosterPdfExporterStyled {
         return img;
     }
 
+    private static ImageData loadCompressedImage(
+            String path,
+            float jpegQuality
+    ) throws IOException {
+
+        BufferedImage src = ImageIO.read(new File(path));
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageWriter writer = ImageIO.getImageWritersByFormatName("jpg").next();
+
+        ImageWriteParam param = writer.getDefaultWriteParam();
+        param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+        param.setCompressionQuality(jpegQuality); // ex: 0.75 – 0.85
+
+        writer.setOutput(ImageIO.createImageOutputStream(baos));
+        writer.write(null, new IIOImage(src, null, null), param);
+        writer.dispose();
+
+        return ImageDataFactory.create(baos.toByteArray());
+    }
 
 
 
