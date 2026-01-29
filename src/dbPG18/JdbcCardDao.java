@@ -182,7 +182,50 @@ public class JdbcCardDao implements AutoCloseable  {
     }
 
 
+    public CardDbRow findRowById(UUID id) {
 
+        String sql = """
+            SELECT
+                id,
+                identity_hash,
+                public_id,
+                name,
+                card_type,
+                faction,
+                energy_cost,
+                attack,
+                defense,
+                power_score
+            FROM card
+            WHERE id = ?
+        """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setObject(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (!rs.next()) {
+                return null;
+            }
+
+            return new CardDbRow(
+                UUID.fromString(rs.getString("id")),
+                rs.getString("identity_hash"),
+                rs.getString("public_id"),
+                rs.getString("name"),
+                CardType.valueOf(rs.getString("card_type")),
+                Faction.valueOf(rs.getString("faction")),
+                rs.getInt("energy_cost"),
+                (Integer) rs.getObject("attack"),
+                (Integer) rs.getObject("defense"),
+                rs.getInt("power_score")
+            );
+
+        } catch (SQLException e) {
+            throw new RuntimeException("findRowById failed for id=" + id, e);
+        }
+    }
 
     public CardDbRow findRowByPublicId(String publicId) {
 

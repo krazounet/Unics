@@ -24,19 +24,21 @@ public final class CardSnapshotPromptGenerator {
 
     public String generatePrompt() {
         StringBuilder prompt = new StringBuilder();
-       // prompt.append("single figure occupying at least 80% of the image width, asymmetrical composition,");
-        // Intention visuelle figée (snapshot)
-        //prompt.append(snapshot.illustrationPromptBase).append(", ");
-
         appendCardType(prompt);
         appendFactionStyle(prompt);
-        appendRoleAndStats(prompt);
-        appendKeywords(prompt);
-        appendEffects(prompt);
-        appendGlobalStyle(prompt);
-        // Style & contraintes IA (RenderProfile)
-        prompt.append(profile.stylePrompt).append(", ");
-       // prompt.append(profile.negativePrompt);
+
+        if (snapshot.type == CardType.UNIT) {
+            appendRoleAndStats(prompt);
+            appendKeywords(prompt);
+            appendEffects(prompt);
+        } else if (snapshot.type == CardType.STRUCTURE) {
+            appendKeywords(prompt);
+            appendStructureEffects(prompt);
+        } else {
+            appendKeywords(prompt);
+            appendEffects(prompt);
+        }
+
 
         return prompt.toString().trim();
     }
@@ -73,10 +75,45 @@ public final class CardSnapshotPromptGenerator {
     private void appendEffects(StringBuilder sb) {
         if (snapshot.effects == null || snapshot.effects.isEmpty()) return;
 
-        for (EffectSnapshot effect : snapshot.effects) {
-            sb.append(effectToVisual(effect.ability)).append(", ");
+        if (snapshot.effects.size() > 1) {
+            // ne décrire que la plus importante visuellement
+        	if (snapshot.type == CardType.ACTION) {
+                sb.append(effectToVisualAbstract(snapshot.effects.get(0).ability)).append(", ");
+            } else {
+                sb.append(effectToVisual(snapshot.effects.get(0).ability)).append(", ");
+            }
         }
+        /*
+        for (EffectSnapshot effect : snapshot.effects) {
+
+            // 🔒 ACTION = effet abstrait, jamais de cible visible
+            if (snapshot.type == CardType.ACTION) {
+                sb.append(effectToVisualAbstract(effect.ability)).append(", ");
+            } else {
+                sb.append(effectToVisual(effect.ability)).append(", ");
+            }
+        }
+        */
     }
+    private static String effectToVisualAbstract(AbilityType ability) {
+        return switch (ability) {
+
+            case DAMAGE_UNIT_ENEMY,
+                 DESTROY_UNIT_ENEMY ->
+                "violent magical discharge, explosive arcane energy release";
+
+            case DEBUFF_ENEMY,
+                 ENERGY_LOSS_ENEMY ->
+                "corrupting energy field, draining aura, magical suppression";
+
+            case ENERGY_GAIN_SELF ->
+                "accumulation of arcane energy, glowing reserves, unstable power surge";
+
+            default ->
+                "magical effect, unstable arcane phenomenon";
+        };
+    }
+
 
       
 
@@ -98,32 +135,80 @@ public final class CardSnapshotPromptGenerator {
             		+ "clean background,"
             		+ "subject fills the frame"
             		+ " ");
-            case STRUCTURE -> sb.append("single structure occupying at least 80% of the image width, centered, no characters, ");
-            case ACTION -> sb.append("single visual effect, no characters visible, ");
+            case STRUCTURE -> sb.append(
+            	    "single massive structure, three-dimensional, volumetric, "
+            	  + "clearly identifiable defensive building, "
+            	  + "recognizable function such as gate, tower, fortress or engine, "
+            	  + "not decorative, not symbolic, "
+            	  + "occupying at least 80% of the image width, "
+            	  + "solid construction, thick walls, "
+            	  + "centered composition, "
+            	  + "no characters, "
+            	);
+            case ACTION -> sb.append(
+            	    "single visual effect, "
+            	  + "one dominant magical phenomenon, "
+            	  + "clear central shape, strong focal point, "
+            	  + "effect clearly readable at a distance, "
+            	  + "no characters visible, "
+            	);
 		default -> throw new IllegalArgumentException("Unexpected value: " + snapshot.type);
         }
     }
 
    
+    private void appendStructureEffects(StringBuilder sb) {
+        if (snapshot.effects == null) return;
+
+        for (EffectSnapshot effect : snapshot.effects) {
+            sb.append(effectToStructureVisual(effect.ability)).append(", ");
+        }
+    }
+
+    private static String effectToStructureVisual(AbilityType ability) {
+        return switch (ability) {
+
+            case BUFF ->
+                "reinforced structure, glowing defensive runes, fortified surface";
+
+            case DEBUFF_ENEMY ->
+                "oppressive field radiating from the structure, suppressive aura";
+
+            case DAMAGE_UNIT_ENEMY, DESTROY_UNIT_ENEMY ->
+                "lethal defensive mechanism embedded in the structure, energy discharge outward";
+
+            case ENERGY_GAIN_SELF ->
+                "structure absorbing ambient energy, internal power accumulation";
+
+            default ->
+                "ancient fortified structure infused with arcane power";
+        };
+    }
 
 
    
    
 
     private void appendGlobalStyle(StringBuilder sb) {
-    	sb.append(
-    		    "epic lighting, dramatic composition, " +
-    		    "high detail, digital painting, " +
-    		    "fantasy illustration, " +
-    		    "artwork illustration only, full bleed artwork, " +
-    		    "clean background, centered subject, " +
-    		    "no frame, no borders, no UI elements, " +
-    		    "no text, no watermark, no logo"+
-    		    "single character, one subject only, solo, "+
-    		    "trading card illustration, card art, subject fills the frame, "
-    		);
 
+        sb.append(
+            "epic lighting, dramatic composition, " +
+            "high detail, digital painting, " +
+            "fantasy illustration, " +
+            "artwork illustration only, full bleed artwork, " +
+            "clean background, centered subject, " +
+            "no frame, no borders, no UI elements, " +
+            "no text, no watermark, no logo, "
+        );
+
+        if (snapshot.type == CardType.UNIT) {
+            sb.append(
+                "single character, one subject only, solo, " +
+                "trading card illustration, card art, subject fills the frame, "
+            );
+        }
     }
+
 
     // ─────────────────────────────────────────────
     // 🎭 VISUELS PAR FACTION
@@ -134,7 +219,7 @@ public final class CardSnapshotPromptGenerator {
             case ASTRAL ->
                 "cosmic energy, glowing stars, ethereal light, celestial motifs";
             case MECHANICAL ->
-                "steampunk machinery, metal plates, gears, industrial design";
+                "steampunk machinery, metal plates, gears, industrial";
             case ORGANIC ->
                 "living plants, roots, nature magic, organic textures";
             case NOMAD ->
@@ -183,7 +268,7 @@ public final class CardSnapshotPromptGenerator {
                 "unyielding presence, firmly anchored or mechanically locked in place";
 
             case UNIQUE ->
-                "iconic and singular appearance, heroic design or legendary artifact";
+                "singular appearance, heroic design or legendary artifact";
 
             // ───────────── Mobilité ─────────────
 
@@ -257,7 +342,7 @@ public final class CardSnapshotPromptGenerator {
             // ──────────────── Cards ────────────────
 
             case DRAW ->
-                "emerging symbols, glowing data streams, or new resources materializing";
+                "emerging, glowing data streams, or new resources materializing";
 
             case DESTROY_UNIT_ENEMY ->
                 "brutal destruction of an enemy unit, explosion or targeted disintegration";

@@ -34,6 +34,12 @@ public enum RenderProfile {
         + "ui,  "
         + "frame,  "
         + "border  "
+        + "split scene, "
+        + "dual scene, "
+        + "diptych, "
+        + "two panels, "
+        + "multiple focal points, "
+
         
       + "",
 

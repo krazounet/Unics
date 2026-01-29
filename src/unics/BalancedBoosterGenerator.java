@@ -99,15 +99,7 @@ public class BalancedBoosterGenerator {
             throw new RuntimeException("Erreur lors de la lecture du dossier ComfyUI output", e);
         }
     }
-    public static List<String> getPromptduBooster(Booster booster){
-    	
-    	List<String> prompts=new ArrayList<String>();
-    	for (Card c : booster.getCards()) {
-    		prompts.add(new CardPromptGenerator(c).generatePrompt());
-    	}
-		return prompts;
-    	
-    }
+    
 
     private static CardRenderPipeline getPipeline() {
 

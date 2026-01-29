@@ -19,31 +19,36 @@ public class JdbcCardRenderDao implements CardRenderDaoInterface {
 
         String sql = """
             INSERT INTO card_render (
-                render_id,
-                visual_signature,
-                render_profile,
-                status,
-                image_path,
-                seed,
-                workflow_id,
-                created_at
-            )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        render_id,
+        visual_signature,
+        render_profile,
+
+        prompt,
+        negative_prompt,
+
+        seed,
+        workflow_id,
+        status,
+        created_at
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """;
 
         try (Connection c = DbUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
 
-            ps.setObject(1, r.renderId);
-            ps.setString(2, r.visual_signature);
-            ps.setString(3, r.renderProfile.name());
+        	ps.setObject(1, r.renderId);
+        	ps.setString(2, r.visual_signature);
+        	ps.setString(3, r.renderProfile.name());
 
-            ps.setString(4, r.status.name());
-            ps.setString(5, r.imagePath);
+        	ps.setString(4, r.prompt);
+        	ps.setString(5, r.negativePrompt);
 
-            ps.setLong(6, r.seed);
-            ps.setString(7, r.workflowId);
-            ps.setTimestamp(8, Timestamp.from(r.createdAt));
+        	ps.setLong(6, r.seed);
+        	ps.setString(7, r.workflowId);
+        	ps.setString(8, r.status.name());
+        	ps.setTimestamp(9, Timestamp.from(r.createdAt));
+
 
             ps.executeUpdate();
 
