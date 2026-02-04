@@ -264,7 +264,7 @@ public class CardEffect {
     
     public String toDisplayString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("("+this.computeRawPower()+":"+this.getTrigger().getWeight()+"/"+this.getAbility().getWeight()+"/"+this.getValue()+")");
+        //sb.append("("+this.computeRawPower()+":"+this.getTrigger().getWeight()+"/"+this.getAbility().getWeight()+"/"+this.getValue()+")");
         // Trigger
         
         

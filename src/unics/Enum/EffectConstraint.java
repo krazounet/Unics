@@ -26,9 +26,9 @@ public enum EffectConstraint {
     COST_1_OR_LESS		(ConstraintType.COUT,"de coût 1", -30),//a revoir si des cartes coute 0
 
 	//───────── POSITION ─────────
-	POSITION_FRONT		(ConstraintType.POSITION,"en position Avant",-15),
-	POSITION_MIDDLE		(ConstraintType.POSITION,"en position Centrale",-15),
-	POSITION_BACK		(ConstraintType.POSITION,"en position arrière",-15),
+	POSITION_LEFT		(ConstraintType.POSITION,"en position Gauche",-15),
+	POSITION_CENTER		(ConstraintType.POSITION,"en position Centrale",-15),
+	POSITION_RIGHT		(ConstraintType.POSITION,"en position Droite",-15),
 	
 	//───────── KW ─────────
 	//KEYWORD_PRESENT("",0), à revoir
@@ -127,12 +127,12 @@ public enum EffectConstraint {
             case COST_3_OR_LESS ->
                     "vous avez une autre carte de coût 3 ou moins";
             
-            case POSITION_BACK ->
-            		"vous avez une carte est en position arrière";
-            case POSITION_MIDDLE ->
-            		"vous avez une carte est en position centrale";
-            case POSITION_FRONT ->
-            		"vous avez une carte est en position avant";
+            case POSITION_LEFT ->
+            		"vous avez une carte à gauche";
+            case POSITION_CENTER ->
+            		"vous avez une carte au centre";
+            case POSITION_RIGHT ->
+            		"vous avez une carte à droite";
             		
             case ALLIED_UNIT_PRESENT ->
             		"une autre carte en jeu";

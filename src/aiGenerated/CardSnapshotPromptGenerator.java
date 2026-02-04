@@ -188,7 +188,7 @@ public final class CardSnapshotPromptGenerator {
 
    
    
-
+/*
     private void appendGlobalStyle(StringBuilder sb) {
 
         sb.append(
@@ -208,7 +208,7 @@ public final class CardSnapshotPromptGenerator {
             );
         }
     }
-
+*/
 
     // ─────────────────────────────────────────────
     // 🎭 VISUELS PAR FACTION
@@ -396,6 +396,10 @@ public final class CardSnapshotPromptGenerator {
 		default -> throw new IllegalArgumentException("Unexpected value: " + ability);
         };
     }
+
+	public RenderProfile getProfile() {
+		return profile;
+	}
     
     
     

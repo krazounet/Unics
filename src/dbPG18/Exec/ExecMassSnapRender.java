@@ -17,7 +17,7 @@ import unics.Card;
 
 public class ExecMassSnapRender {
 
-    public static final int BATCH_SIZE = 100;
+    public static final int BATCH_SIZE = 20;
 
     /**
      * Pipeline :

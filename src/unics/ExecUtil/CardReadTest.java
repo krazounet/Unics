@@ -6,12 +6,13 @@ import dbPG18.JdbcCardDao;
 import unics.Card;
 public class CardReadTest {
 
+    
     public static void main(String[] args) {
 
         try {
 
             JdbcCardDao dao =
-                new JdbcCardDao(DbUtil.getConnection());
+                new JdbcCardDao(DbUtil.getConnectionSupabase());
 
             try {
                 CardDbRow row =

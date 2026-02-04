@@ -97,7 +97,8 @@ public final class Card {
                 e.getAbility(),
                 e.getValue(),
                 e.getTargetType(),
-                e.getConstraints()
+                e.getConstraints(),
+                e.toDisplayString()
             ))
             .toList();
 

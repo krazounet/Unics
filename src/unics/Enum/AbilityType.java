@@ -364,7 +364,7 @@ public enum AbilityType {
 
     @Override
     public String toString() {
-        return displayName + " (" + name() + ", poids=" + weight + ")";
+        return name();
     }
     
     public int maxValue() {

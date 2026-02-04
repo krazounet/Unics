@@ -193,7 +193,7 @@ public enum TriggerType {
     
     @Override
     public String toString() {
-        return displayName + " (" + name() + ", poids=" + weight + ")";
+        return name();
     }
     /**
      * Liste les associations interdites entre Keyword et Trigger

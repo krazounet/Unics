@@ -25,35 +25,25 @@ public final class EffectSnapshot {
     public final TargetType targetType;
     public final Set<EffectConstraint> constraints;
 
-    public EffectSnapshot(
-        TriggerType trigger,
-        Keyword conditionKeyword,
-        AbilityType ability,
-        Integer value,
-        TargetType targetType,
-        Set<EffectConstraint> constraints
-    ) {
-        this.trigger = trigger;
-        this.conditionKeyword = conditionKeyword;
-        this.ability = ability;
-        this.value = value;
-        this.targetType = targetType;
-        this.constraints = Set.copyOf(constraints);
-    }
-    @JsonCreator
+    public final String french;
+    
+    
+    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public EffectSnapshot(
         @JsonProperty("trigger") TriggerType trigger,
         @JsonProperty("conditionKeyword") Keyword conditionKeyword,
         @JsonProperty("ability") AbilityType ability,
-        @JsonProperty("value") int value,
+        @JsonProperty("value") Integer value, // 👈 CRUCIAL
         @JsonProperty("targetType") TargetType targetType,
-        @JsonProperty("constraints") Set<EffectConstraint> constraints
+        @JsonProperty("constraints") Set<EffectConstraint> constraints,
+        @JsonProperty("french") String french
     ) {
         this.trigger = trigger;
         this.conditionKeyword = conditionKeyword;
         this.ability = ability;
         this.value = value;
         this.targetType = targetType;
-        this.constraints = constraints;
+        this.constraints = constraints != null ? Set.copyOf(constraints) : Set.of();
+        this.french = french;
     };
 }

@@ -67,6 +67,6 @@ public enum TargetType {
      */
     @Override
     public String toString() {
-        return displayName + " (" + name() + ", poids=" + weight + ")";
+        return name();
     }
 }

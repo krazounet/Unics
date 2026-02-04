@@ -118,7 +118,7 @@ public enum Keyword {
     
     @Override
     public String toString() {
-        return this.name() + " : " + description + " (Poids: " + generatorWeight + ")";
+        return this.name();
     }
     
     public int computeWeight(int atk, int def, int energy) {
