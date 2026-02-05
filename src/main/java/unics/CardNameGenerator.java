@@ -84,6 +84,6 @@ public final class CardNameGenerator {
         }
 
         // Combinaison finale
-        return prefixPart + suffix + keywordPart + "-" + publicId;
+        return prefixPart + suffix + keywordPart;
     }
 }

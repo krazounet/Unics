@@ -269,7 +269,7 @@ public class CardEffect {
         
         
         
-        sb.append(trigger.getShortDisplay(conditionKeyword)).append(" : ");
+        sb.append("[u]"+trigger.getShortDisplay(conditionKeyword)).append("[/u]");
         
         sb.append(getEffectText());
         

@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public final class DbUtil {
-	private static boolean useSUPABASE=true;
+	private static boolean useSUPABASE=false;
     private DbUtil() {}
 
     public static Connection getConnection() throws SQLException {

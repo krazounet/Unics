@@ -10,9 +10,10 @@ public class DbTest {
         String user = "postgres";     // adapte si besoin
         String password = "postgres";
 
-        try (@SuppressWarnings("unused")
+        try(
 		Connection conn = DriverManager.getConnection(url, user, password)) {
             System.out.println("Connexion PostgreSQL OK !");
+            conn.close();
         }
     }
 }
