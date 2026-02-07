@@ -39,6 +39,7 @@ public abstract class Booster {
 	}
 
 	protected List<Card> generateCards(CardType type, int count) {
+				
     	int index_cost=0;
         List<Card> cards = new ArrayList<>();
         

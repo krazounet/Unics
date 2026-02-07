@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.UUID;
 
 import dbPG18.DbUtil;
@@ -28,13 +29,14 @@ public class ExecMassSnapRender {
      *    - cache visuel
      *    - render
      *    - génération éventuelle
+     * @throws SQLException 
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
 
         int processed = 0;
-
-        JdbcCardSnapshotDao snapshotDao = new JdbcCardSnapshotDao();
-        JdbcCardRenderDao renderDao = new JdbcCardRenderDao();
+        Connection conn = DbUtil.getConnection();
+        JdbcCardSnapshotDao snapshotDao = new JdbcCardSnapshotDao(conn);
+        JdbcCardRenderDao renderDao = new JdbcCardRenderDao(conn);
 
         ComfyUIWorker worker =
             new ComfyUIWorker(
@@ -45,7 +47,7 @@ public class ExecMassSnapRender {
         CardRenderPipeline pipeline =
             new CardRenderPipeline(snapshotDao, renderDao, worker);
 
-        try (Connection c = DbUtil.getConnection()) {
+        try (Connection c = conn) {
 
             PreparedStatement ps = c.prepareStatement("""
                 SELECT c.id

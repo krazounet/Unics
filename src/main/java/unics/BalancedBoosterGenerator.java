@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -107,11 +109,18 @@ public class BalancedBoosterGenerator {
             return pipeline;
         }
 
-        CardSnapshotDaoInterface snapshotDao =
-            new JdbcCardSnapshotDao();
+        CardSnapshotDaoInterface snapshotDao = null;
+        CardRenderDaoInterface renderDao = null;
+		try {
+			Connection conn = DbUtil.getConnection();
+			snapshotDao = new JdbcCardSnapshotDao(conn);
+			renderDao =new JdbcCardRenderDao(conn);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-        CardRenderDaoInterface renderDao =
-            new JdbcCardRenderDao();
+       
 
         ComfyUIClient client =
             new ComfyUIClient("http://localhost:8188");

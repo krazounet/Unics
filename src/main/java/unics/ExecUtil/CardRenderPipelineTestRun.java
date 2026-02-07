@@ -1,6 +1,7 @@
 package unics.ExecUtil;
 
 import java.nio.file.Path;
+import java.sql.Connection;
 
 import aiGenerated.*;
 import dbPG18.*;
@@ -40,12 +41,12 @@ public final class CardRenderPipelineTestRun {
             // ─────────────────────────────────────────────
             // 2️⃣ Initialiser le pipeline
             // ─────────────────────────────────────────────
-
+            Connection conn = DbUtil.getConnection();
             CardSnapshotDaoInterface snapshotDao =
-                new JdbcCardSnapshotDao();
+                new JdbcCardSnapshotDao(conn);
 
             CardRenderDaoInterface renderDao =
-                new JdbcCardRenderDao();
+                new JdbcCardRenderDao(conn);
 
             ComfyUIClient client =
                 new ComfyUIClient("http://localhost:8188");

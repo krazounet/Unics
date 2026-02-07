@@ -9,12 +9,24 @@ import aiGenerated.RenderProfile;
 import aiGenerated.RenderStatus;
 
 public class JdbcCardRenderDao implements CardRenderDaoInterface {
-
+	private final Connection connection;
+	
+	public JdbcCardRenderDao(Connection connection) {
+		super();
+		this.connection = connection;
+	}
+	
+	@Deprecated
+	public JdbcCardRenderDao() throws SQLException {
+		super();
+		this.connection = DbUtil.getConnection();
+	}
     // ─────────────────────────────────────────────
     // INSERT (idempotent via UNIQUE constraint)
     // ─────────────────────────────────────────────
 
-    @Override
+    
+	@Override
     public void insert(CardRender r) {
 
         String sql = """
@@ -34,8 +46,8 @@ public class JdbcCardRenderDao implements CardRenderDaoInterface {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """;
 
-        try (Connection c = DbUtil.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+        try (
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
         	ps.setObject(1, r.renderId);
         	ps.setString(2, r.visual_signature);
@@ -76,8 +88,8 @@ public class JdbcCardRenderDao implements CardRenderDaoInterface {
               AND render_profile = ?
         """;
 
-        try (Connection c = DbUtil.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+        try (
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, visualSignature);
             ps.setString(2, profile.name());
@@ -115,8 +127,8 @@ public class JdbcCardRenderDao implements CardRenderDaoInterface {
             WHERE render_id = ?
         """;
 
-        try (Connection c = DbUtil.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+        try (
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, RenderStatus.DONE.name());
             ps.setString(2, imagePath);
@@ -149,8 +161,8 @@ public class JdbcCardRenderDao implements CardRenderDaoInterface {
             WHERE render_id = ?
         """;
 
-        try (Connection c = DbUtil.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+        try (
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, RenderStatus.FAILED.name());
             ps.setString(2, errorMessage);
@@ -177,8 +189,8 @@ public class JdbcCardRenderDao implements CardRenderDaoInterface {
             WHERE render_id = ?
         """;
 
-        try (Connection c = DbUtil.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+        try (
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setObject(1, renderId);
             ResultSet rs = ps.executeQuery();

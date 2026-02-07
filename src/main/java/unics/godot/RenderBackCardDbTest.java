@@ -2,6 +2,7 @@ package unics.godot;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.sql.Connection;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
@@ -9,6 +10,7 @@ import javax.imageio.ImageIO;
 import aiGenerated.CardRender;
 import aiGenerated.RenderProfile;
 import dbPG18.JdbcCardSnapshotDao;
+import dbPG18.DbUtil;
 import dbPG18.JdbcCardRenderDao;
 import unics.snapshot.CardSnapshot;
 
@@ -30,10 +32,11 @@ public class RenderBackCardDbTest {
         System.out.println("Snapshot ID : " + SNAPSHOT_ID);
 
         try {
+        	Connection conn = DbUtil.getConnection();
             // ─────────────────────────────
             // 1. Charger le snapshot
             // ─────────────────────────────
-            JdbcCardSnapshotDao snapshotDao = new JdbcCardSnapshotDao();
+            JdbcCardSnapshotDao snapshotDao = new JdbcCardSnapshotDao(conn);
             CardSnapshot snapshot = snapshotDao.findById(SNAPSHOT_ID);
 
             if (snapshot == null) {
@@ -48,7 +51,7 @@ public class RenderBackCardDbTest {
             // ─────────────────────────────
             // 2. Charger le render via visualSignature
             // ─────────────────────────────
-            JdbcCardRenderDao renderDao = new JdbcCardRenderDao();
+            JdbcCardRenderDao renderDao = new JdbcCardRenderDao(conn);
             CardRender render =
                 renderDao.findByVisualSignature(snapshot.visualSignature,RenderProfile.DEFAULT);
 

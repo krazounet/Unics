@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,8 +17,20 @@ import unics.snapshot.EffectSnapshot;
 import unics.Enum.*;
 
 public class JdbcCardSnapshotDao implements CardSnapshotDaoInterface {
+	private final Connection connection;
+	
+	
+    public JdbcCardSnapshotDao(Connection connection) {
+		super();
+		this.connection = connection;
+	}
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    @Deprecated
+    public JdbcCardSnapshotDao() throws SQLException {
+    	this.connection = DbUtil.getConnection();
+    }
+    
+	private static final ObjectMapper MAPPER = new ObjectMapper();
 
     // ─────────────────────────────────────────────
     // INSERT
@@ -58,8 +71,8 @@ public class JdbcCardSnapshotDao implements CardSnapshotDaoInterface {
             ON CONFLICT (signature) DO NOTHING
         """;
 
-        try (Connection c = DbUtil.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+        try (
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setObject(1, s.snapshotId);
             ps.setObject(2, s.cardId);
@@ -108,8 +121,8 @@ public class JdbcCardSnapshotDao implements CardSnapshotDaoInterface {
             WHERE signature = ?
         """;
 
-        try (Connection c = DbUtil.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+        try (
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setString(1, signature);
             ResultSet rs = ps.executeQuery();
@@ -134,8 +147,8 @@ public class JdbcCardSnapshotDao implements CardSnapshotDaoInterface {
             WHERE id = ?
         """;
 
-        try (Connection c = DbUtil.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+        try (
+             PreparedStatement ps = connection.prepareStatement(sql)) {
 
             ps.setObject(1, id);
             ResultSet rs = ps.executeQuery();
@@ -193,7 +206,39 @@ public class JdbcCardSnapshotDao implements CardSnapshotDaoInterface {
             throw new SQLException("map CardSnapshot failed", e);
         }
     }
+    /**
+     * donne count cartdsnapshot auy hasard
+     * @param count
+     * @return
+     */
+    public List<CardSnapshot> findRandom(int count) {
 
+        String sql = """
+        		SELECT s.* 
+        		FROM card_render r
+        		JOIN card_snapshot s
+        		ON s.visual_signature = r.visual_signature
+        		WHERE r.finished_at IS NOT NULL
+        		AND r.status = 'DONE'
+        		ORDER BY random()
+        		LIMIT ? 
+        """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            ps.setInt(1, count);
+            ResultSet rs = ps.executeQuery();
+
+            List<CardSnapshot> result = new ArrayList<>();
+            while (rs.next()) {
+                result.add(mapRow(rs));
+            }
+            return result;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("findRandom CardSnapshot failed", e);
+        }
+    }
 
     // ─────────────────────────────────────────────
     // JSON HELPERS
