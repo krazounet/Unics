@@ -4,6 +4,9 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import unics.Enum.*;
 
 public final class CardSnapshot {
@@ -38,7 +41,7 @@ public final class CardSnapshot {
     public final Instant generatedAt;
     public final String generatorVersion;
     public final int schemaVersion;
-
+/*
     public CardSnapshot(
     	UUID snapshotId,
         UUID cardId,
@@ -88,4 +91,61 @@ public final class CardSnapshot {
         this.generatorVersion = generatorVersion;
         this.schemaVersion = schemaVersion;
     }
+    */
+    @JsonCreator
+    public CardSnapshot(
+        @JsonProperty("snapshotId") UUID snapshotId,
+        @JsonProperty("cardId") UUID cardId,
+        @JsonProperty("publicId") String publicId,
+        @JsonProperty("signature") String signature,
+        @JsonProperty("visualSignature") String visualSignature,
+        @JsonProperty("snapshotVersion") int snapshotVersion,
+
+        @JsonProperty("type") CardType type,
+        @JsonProperty("faction") Faction faction,
+        @JsonProperty("cost") int cost,
+        @JsonProperty("attack") int attack,
+        @JsonProperty("health") int health,
+        @JsonProperty("keywords") List<Keyword> keywords,
+        @JsonProperty("effects") List<EffectSnapshot> effects,
+
+        @JsonProperty("name") String name,
+        @JsonProperty("rulesText") String rulesText,
+        @JsonProperty("flavorText") String flavorText,
+
+        @JsonProperty("illustrationPromptBase") String illustrationPromptBase,
+        @JsonProperty("frameId") String frameId,
+
+        @JsonProperty("generatedAt") Instant generatedAt,
+        @JsonProperty("generatorVersion") String generatorVersion,
+        @JsonProperty("schemaVersion") int schemaVersion
+    ) {
+        this.snapshotId = snapshotId;
+        this.cardId = cardId;
+        this.publicId = publicId;
+        this.signature = signature;
+        this.visualSignature = visualSignature;
+        this.snapshotVersion = snapshotVersion;
+
+        this.type = type;
+        this.faction = faction;
+        this.cost = cost;
+        this.attack = attack;
+        this.health = health;
+        this.keywords = List.copyOf(keywords);
+        this.effects = List.copyOf(effects);
+
+        this.name = name;
+        this.rulesText = rulesText;
+        this.flavorText = flavorText;
+
+        this.illustrationPromptBase = illustrationPromptBase;
+        this.frameId = frameId;
+
+        this.generatedAt = generatedAt;
+        this.generatorVersion = generatorVersion;
+        this.schemaVersion = schemaVersion;
+    }
+
+    
 }
