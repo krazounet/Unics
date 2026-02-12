@@ -183,7 +183,8 @@ public enum AbilityType {
 	/**
 	 * Silence
 	 * reveal hand
-	 * return to hand
+	 * regard (scry)
+	 * draw_from_discard
 	 */
     private final String displayName;
     private final String description;
