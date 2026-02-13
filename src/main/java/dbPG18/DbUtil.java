@@ -18,6 +18,7 @@ public final class DbUtil {
             );
     }
     /*
+     * 
     public static Connection getConnectionSupabase() throws SQLException {
     	System.out.println("Supabase!");
         return DriverManager.getConnection(
