@@ -12,7 +12,7 @@ public class CardReadTest {
         try {
 
             JdbcCardDao dao =
-                new JdbcCardDao(DbUtil.getConnectionSupabase());
+                new JdbcCardDao(DbUtil.getConnection());
 
             try {
                 CardDbRow row =
