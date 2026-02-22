@@ -1,7 +1,6 @@
 package unics.ExecUtil;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 
 import dbPG18.DbUtil;
 

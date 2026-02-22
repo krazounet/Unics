@@ -25,11 +25,7 @@ public class JdbcCardSnapshotDao implements CardSnapshotDaoInterface {
 		this.connection = connection;
 	}
 
-    @Deprecated
-    public JdbcCardSnapshotDao() throws SQLException {
-    	this.connection = DbUtil.getConnection();
-    }
-    
+        
 	private static final ObjectMapper MAPPER = new ObjectMapper();
 
     // ─────────────────────────────────────────────

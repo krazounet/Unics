@@ -229,8 +229,8 @@ public enum AbilityType {
     public EnumSet<TriggerType> getAllowedTriggers() {
         return switch (this) {
             case DEBUFF_ENEMY, DEBUFF_ALLY,BUFF -> EnumSet.of(
-                TriggerType.ON_ATTACK,
-                TriggerType.ON_BEING_ATTACKED,  
+                TriggerType.AFTER_ATTACK,
+                TriggerType.AFTER_BEING_ATTACKED,  
                 TriggerType.ON_ENTER,
                 TriggerType.ON_ACTIVATION,
                 TriggerType.AFTER_DAMAGE,

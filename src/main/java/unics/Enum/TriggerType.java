@@ -39,9 +39,9 @@ public enum TriggerType {
         EnumSet.of(CardType.UNIT, CardType.STRUCTURE)
     ),
 
-    ON_ATTACK(//moins probable car il faut avoir survécu
+    AFTER_ATTACK(//moins probable car il faut avoir survécu !!! A TRANSFORMER EN AFTER_ATTACK
         "À l’attaque",
-        "La capacité se déclenche lorsque la carte attaque",
+        "La capacité se déclenche après que la carte attaque",
         -5,
         EnumSet.of(CardType.UNIT)
     ),
@@ -53,7 +53,7 @@ public enum TriggerType {
         EnumSet.of(CardType.UNIT)
     ),
 
-    ON_BEING_ATTACKED(//rien n'indique qu'elle sera attaquée sauf les structures... le cout devrait peut être est dépendant des KW
+    AFTER_BEING_ATTACKED(//rien n'indique qu'elle sera attaquée sauf les structures... le cout devrait peut être est dépendant des KW
         "Lorsqu’elle est attaquée",
         "La capacité se déclenche lorsqu’une unité ennemie attaque cette carte",
         -10,
@@ -146,6 +146,10 @@ public enum TriggerType {
 	/**
 	 * ON PLAY ADJACENT
 	 * ON TARGETED
+	 * ON DRAW
+	 * ON_BEIGN_DISCARD (lui)
+	 * ON DISCARD (une autre carte)
+	 * ON MULLIGAN
 	 */
     // ──────────────────────────────
 
@@ -179,8 +183,8 @@ public enum TriggerType {
         return switch (this) {
             case ON_PLAY -> "Quand cette carte est jouée";
             case ON_ENTER -> "Quand cette carte arrive en jeu";
-            case ON_ATTACK -> "Quand cette carte attaque";
-            case ON_BEING_ATTACKED -> "Quand cette carte est attaquée";
+            case AFTER_ATTACK -> "Après que cette carte attaque";
+            case AFTER_BEING_ATTACKED -> "Après que cette carte soit attaquée";
             case ON_DEATH -> "Quand cette carte meurt";
             case ON_TURN_START -> "Au début de votre tour";
             case ON_TURN_END -> "À la fin de votre tour";
