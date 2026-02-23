@@ -246,7 +246,7 @@ public class JdbcCardSnapshotDao implements CardSnapshotDaoInterface {
         		ON s.visual_signature = r.visual_signature
         		WHERE r.finished_at IS NOT NULL
         		AND r.status = 'DONE'
-        		AND s.card_type = '?'
+        		AND s.card_type = ?
         		AND s.cost = ?
         		ORDER BY random()
 
