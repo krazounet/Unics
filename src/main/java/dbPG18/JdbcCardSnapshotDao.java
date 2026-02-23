@@ -255,10 +255,12 @@ public class JdbcCardSnapshotDao implements CardSnapshotDaoInterface {
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
         	ps.setString(1, type);
             ps.setInt(2, mana);
-            ResultSet rs = ps.executeQuery();
-
             
-            return mapRow(rs);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return mapRow(rs);
+            }
+            return null;
 
         } catch (SQLException e) {
             throw new RuntimeException("findRandom CardSnapshot failed", e);
