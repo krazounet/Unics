@@ -11,20 +11,15 @@ public final class DbUtil {
     public static Connection getConnection() throws SQLException {
     	
         
-    	return DriverManager.getConnection(
-    			System.getenv("DB_URL"),
-    			System.getenv("DB_USER"),
-    			System.getenv("DB_PASSWORD")
-            );
+    	Connection conn = DriverManager.getConnection(
+    	        System.getenv("DB_URL"),
+    	        System.getenv("DB_USER"),
+    	        System.getenv("DB_PASSWORD")
+    	    );
+
+    	  //  conn.setAutoCommit(true);   // 🔥 FORÇAGE EXPLICITE
+
+    	    return conn;
     }
-    /*
-     * 
-    public static Connection getConnectionSupabase() throws SQLException {
-    	System.out.println("Supabase!");
-        return DriverManager.getConnection(
-            DbConfigSUPABASE.URL,
-            DbConfigSUPABASE.USER,
-            DbConfigSUPABASE.PASSWORD
-        );
-    }*/
+
 }

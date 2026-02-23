@@ -16,11 +16,7 @@ public class JdbcCardRenderDao implements CardRenderDaoInterface {
 		this.connection = connection;
 	}
 	
-	@Deprecated
-	public JdbcCardRenderDao() throws SQLException {
-		super();
-		this.connection = DbUtil.getConnection();
-	}
+
     // ─────────────────────────────────────────────
     // INSERT (idempotent via UNIQUE constraint)
     // ─────────────────────────────────────────────

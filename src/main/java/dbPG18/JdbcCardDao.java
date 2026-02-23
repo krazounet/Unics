@@ -55,7 +55,24 @@ public class JdbcCardDao implements AutoCloseable  {
 	        throw new RuntimeException(e);
 	    }
 	}
+	public JdbcCardDao(Connection connection, boolean autocommit) {
+	    try {
+	        this.connection = connection;
+	        this.connection.setAutoCommit(autocommit);
 
+	        this.psCard = connection.prepareStatement("""
+	            INSERT INTO card (
+	                id, public_id, identity_hash, identity_version,
+	                name, card_type, faction, energy_cost,
+	                attack, defense, power_score
+	            )
+	            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+	        """);
+
+	    } catch (SQLException e) {
+	        throw new RuntimeException(e);
+	    }
+	}
 	
 	
 	

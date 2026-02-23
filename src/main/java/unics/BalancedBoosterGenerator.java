@@ -50,7 +50,7 @@ public class BalancedBoosterGenerator {
     public static void generateAndExportBooster(String pdfFileName) throws Exception {
  
     	//Booster booster=new Booster18(random);
-    	JdbcCardDao dao=new JdbcCardDao(DbUtil.getConnection());
+    	JdbcCardDao dao=new JdbcCardDao(DbUtil.getConnection(),true);
     	
     	Booster booster=null;
     	if (isDB) {

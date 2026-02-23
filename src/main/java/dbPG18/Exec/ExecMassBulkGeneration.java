@@ -13,7 +13,7 @@ import unics.Enum.CardType;
 import unics.Enum.Faction;
 
 public class ExecMassBulkGeneration {
-	static final int TARGET = 10_000;
+	static final int TARGET = 100_000;
 	static final int MAX_TRIES = TARGET * 3; // sécurité
 	static Map<String, Card> uniques = new LinkedHashMap<>(1_200_000);
 

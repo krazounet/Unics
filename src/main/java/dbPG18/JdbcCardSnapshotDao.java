@@ -34,7 +34,7 @@ public class JdbcCardSnapshotDao implements CardSnapshotDaoInterface {
 
     @Override
     public void insert(CardSnapshot s) {
-
+    	
     	String sql = """
     		    INSERT INTO card_snapshot (
     		        id,
@@ -69,7 +69,7 @@ public class JdbcCardSnapshotDao implements CardSnapshotDaoInterface {
 
         try (
              PreparedStatement ps = connection.prepareStatement(sql)) {
-
+        	
             ps.setObject(1, s.snapshotId);
             ps.setObject(2, s.cardId);
             ps.setString(3, s.publicId);
@@ -99,6 +99,7 @@ public class JdbcCardSnapshotDao implements CardSnapshotDaoInterface {
 
             ps.executeUpdate();
             System.out.println("INSERT SNAPSHOT → " + s.snapshotId);
+            
         } catch (SQLException e) {
             throw new RuntimeException("insert CardSnapshot failed", e);
         }
@@ -236,6 +237,35 @@ public class JdbcCardSnapshotDao implements CardSnapshotDaoInterface {
         }
     }
 
+    public CardSnapshot findRandom(String type,int mana) {
+
+        String sql = """
+        		SELECT s.* 
+        		FROM card_render r
+        		JOIN card_snapshot s
+        		ON s.visual_signature = r.visual_signature
+        		WHERE r.finished_at IS NOT NULL
+        		AND r.status = 'DONE'
+        		AND s.card_type = '?'
+        		AND s.cost = ?
+        		ORDER BY random()
+
+        """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        	ps.setString(1, type);
+            ps.setInt(2, mana);
+            ResultSet rs = ps.executeQuery();
+
+            
+            return mapRow(rs);
+
+        } catch (SQLException e) {
+            throw new RuntimeException("findRandom CardSnapshot failed", e);
+        }
+    }
+    
+    
     // ─────────────────────────────────────────────
     // JSON HELPERS
     // ─────────────────────────────────────────────

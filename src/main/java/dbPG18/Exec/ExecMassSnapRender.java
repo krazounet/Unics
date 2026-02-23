@@ -18,7 +18,7 @@ import unics.Card;
 
 public class ExecMassSnapRender {
 
-    public static final int BATCH_SIZE = 500;
+    public static final int BATCH_SIZE = 1000;
 
     /**
      * Pipeline :
@@ -62,7 +62,7 @@ public class ExecMassSnapRender {
 
             try (
                 ResultSet rs = ps.executeQuery();
-                JdbcCardDao cardDao = new JdbcCardDao(c)
+                JdbcCardDao cardDao = new JdbcCardDao(c,true)
             ) {
 
                 while (rs.next()) {
