@@ -9,41 +9,37 @@ public enum TargetType {
     SELF(
         "Soi-même",
         "La capacité cible uniquement cette carte",
-        false,
-        5
+        false
     ),
 
     ALLY(
         "Allié",
         "La capacité cible une carte alliée",
-        true,
-        10
+        true
     ),
 
     ENEMY(
         "Ennemi",
         "La capacité cible une carte ennemie",
-        true,
-        15
+        true
     ),
 
     ALL(
         "Toutes les cartes",
         "La capacité affecte toutes les cartes en jeu",
-        false,
-        25
+        false
     );
 
     private final String displayName;     // Affichage carte
     private final String description;     // Règles / debug
     private final boolean requiresChoice; // Le joueur doit choisir une cible
-    private final int weight;              // Poids pour génération / équilibre
 
-    TargetType(String displayName, String description, boolean requiresChoice, int weight) {
+
+    TargetType(String displayName, String description, boolean requiresChoice) {
         this.displayName = displayName;
         this.description = description;
         this.requiresChoice = requiresChoice;
-        this.weight = weight;
+
     }
 
     public String getDisplayName() {
@@ -58,9 +54,7 @@ public enum TargetType {
         return requiresChoice;
     }
 
-    public int getWeight() {
-        return weight;
-    }
+ 
 
     /**
      * Utilisé pour debug / logs

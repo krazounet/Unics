@@ -119,6 +119,14 @@ public enum AbilityType {
         10,
         true
     ),
+    MOVE_SELF(
+    		"Déplacement",
+            "Se déplace",
+            5000,
+            true
+    		
+    		
+    		),
 
     // ──────────────── Énergie ────────────────
 
@@ -359,6 +367,8 @@ public enum AbilityType {
             effect="Redresse " + x + "unité"+(value > 1 ? "s" : "")+" "+ faction+" ennemie"+(value > 1 ? "s" : "")+" "+cost;  
             case RETURN_TO_HAND ->
             effect="La carte "+ faction+" ciblée "+cost+" retourne en main";
+            case MOVE_SELF ->
+            effect="Cette carte peut se déplacer sur un autre slot";
         };
         return effect;
     }

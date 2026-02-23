@@ -354,6 +354,8 @@ public final class CardSnapshotPromptGenerator {
 
             case MOVE_ALLY ->
                 "tactical repositioning of an allied unit across the battlefield";
+            case MOVE_SELF ->
+            "tactical repositioning of an allied unit across the battlefield";
 
             case MOVE_ENEMY ->
                 "forced displacement or expulsion of an enemy unit";

@@ -83,7 +83,7 @@ public class CardEffect {
             int energyCost,
             ThreadLocalRandom random,
             FactionProfile profile,
-            Set<AbilityType> excludedAbilities,
+            Set<AbilityType> excludedAbilities, //utile pour générer des effets dfférents sur la carte
             Set<Keyword> keywords
     ) {
     	

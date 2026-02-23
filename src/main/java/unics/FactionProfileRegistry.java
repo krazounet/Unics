@@ -42,7 +42,7 @@ public final class FactionProfileRegistry {
                     AbilityType.ENERGY_LOSS_SELF,
                     AbilityType.DAMAGE_PC_SELF
                 ),
-                Set.of()  // forbidden abilities
+                Set.of(AbilityType.MOVE_SELF)  // forbidden abilities
             )
         );
 
@@ -71,7 +71,8 @@ public final class FactionProfileRegistry {
                     AbilityType.MOVE_ALLY
                 ),
                 Set.of(
-                    AbilityType.DISCARD_ENEMY
+                    AbilityType.DISCARD_ENEMY,
+                    AbilityType.MOVE_SELF
                 )
             )
         );
@@ -99,7 +100,8 @@ public final class FactionProfileRegistry {
                     AbilityType.HEAL_PC
                 ),
                 Set.of(
-                    AbilityType.DISCARD_SELF
+                    AbilityType.DISCARD_SELF,
+                    AbilityType.MOVE_SELF
                 )
             )
         );
@@ -127,7 +129,7 @@ public final class FactionProfileRegistry {
                     AbilityType.MOVE_ALLY,
                     AbilityType.MOVE_ENEMY
                 ),
-                Set.of()
+                Set.of(AbilityType.MOVE_SELF)
             )
         );
 
@@ -156,7 +158,8 @@ public final class FactionProfileRegistry {
                     AbilityType.BUFF
                 ),
                 Set.of(
-                    AbilityType.MOVE_ALLY
+                    AbilityType.MOVE_ALLY,
+                    AbilityType.MOVE_SELF
                 )
             )
         );
