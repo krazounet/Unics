@@ -28,6 +28,12 @@ public enum TargetType {
         "Toutes les cartes",
         "La capacité affecte toutes les cartes en jeu",
         false
+    ),
+
+    SLOT(
+        "Position",
+        "La capacité cible une position",
+        true
     );
 
     private final String displayName;     // Affichage carte
