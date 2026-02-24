@@ -36,6 +36,7 @@ public enum EffectConstraint {
 	//───────── PRESENCE ─────────
 	ALLIED_UNIT_PRESENT	(ConstraintType.PRESENSE,"une autre unité en jeu",-10),
 	ENEMY_HAS_STRUCTURE	(ConstraintType.PRESENSE,"l'adversaire a une structure en jeu",-20),
+	//!! UNIT != CARTE, changer le type en NO_ENEMY_CARD
 	NO_ENEMY_UNIT		(ConstraintType.PRESENSE,"l'adversaire n'a pas de carte en jeu",0),
 	
 	//───────── Taille de MAIN ─────────
